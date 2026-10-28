@@ -49,7 +49,7 @@ export const CONTACT = {
 /** LOCALIZAÇÃO — somente o link oficial fornecido. Não há endereço/coordenadas confirmados. */
 export const LOCATION = {
   /** Link oficial do Google Maps fornecido pela academia. */
-  mapsUrl: 'https://maps.app.goo.gl/73vmZQxNDrQsaWcB8',
+  mapsUrl: 'https://www.google.com/maps/place/Apollo+Body+%26+Health+-+Academia+de+muscula%C3%A7%C3%A3o/@-12.9807408,-38.4469645,17z/data=!3m1!4b1!4m6!3m5!1s0x7161b988d25f4fd:0x2a42ec90981ba014!8m2!3d-12.9807408!4d-38.4469645!16s%2Fg%2F11hz0sn786',
   /**
    * URL de incorporação oficial do Google Maps (Compartilhar > Incorporar um mapa > copiar o "src" do iframe).
    * Enquanto estiver vazio, o mapa incorporado não é exibido e os botões continuam funcionando.
