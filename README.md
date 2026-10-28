@@ -18,7 +18,8 @@ npm run og           # regenera public/og-image.jpg (imagem de compartilhamento)
 ```
 
 Publicação: o site é publicado automaticamente no GitHub Pages a cada push na branch `main`
-(workflow `.github/workflows/deploy.yml`) em https://alvaronovaes21-tech.github.io/apollo-body-health/.
+(workflow `.github/workflows/deploy.yml`) no domínio próprio https://www.academiaapollo.com.br
+(configurado em `public/CNAME` e no workflow com `PUBLIC_BASE_PATH=/`).
 
 O `base` do Astro é `/apollo-body-health/` por padrão (por isso o `npm run dev` local responde em
 `http://localhost:4321/apollo-body-health/`). Para publicar em outra hospedagem estática ou em domínio próprio

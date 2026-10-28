@@ -18,8 +18,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      PUBLIC_SITE_URL: https://alvaronovaes21-tech.github.io/apollo-body-health
-      PUBLIC_BASE_PATH: /apollo-body-health/
+      PUBLIC_SITE_URL: https://www.academiaapollo.com.br
+      PUBLIC_BASE_PATH: /
     steps:
       - name: Checkout
         uses: actions/checkout@v4
