@@ -4,7 +4,7 @@ import { buildWhatsAppLink } from '../src/lib/whatsapp.ts';
 import { MESSAGES } from '../src/lib/messages.ts';
 import { eventsFromDataset, EVENTS } from '../src/lib/tracking-events.ts';
 import { MODALITIES } from '../src/data/modalities.ts';
-import { PLANS } from '../src/data/plans.ts';
+import { PLANS, PLAN_EXCLUSION_NOTE, JIU_JITSU_PLANS } from '../src/data/plans.ts';
 import { JUDO } from '../src/data/judo.ts';
 import { FAQ } from '../src/data/faq.ts';
 import { CONTACT, LOCATION, ANALYTICS, YOUTUBE_VIDEO_ID } from '../src/config/site.ts';
@@ -109,8 +109,29 @@ test('Eventos: um único evento primário por clique, sem duplicar', () => {
   for (const name of Object.values(EVENTS)) assert.ok(!/enrol|matricula|purchase/i.test(name));
 });
 
-test('FAQ: 9 perguntas e valor do Judô coerente', () => {
-  assert.equal(FAQ.length, 9);
+test('FAQ: 10 perguntas e valor do Judô coerente', () => {
+  assert.equal(FAQ.length, 10);
   const judoPrice = FAQ.find((f) => f.question.includes('valor mensal do Judô'));
   assert.ok(judoPrice?.answer[0].includes('R$ 166,00'));
+});
+
+test('Planos tradicionais: observação de exclusão do Jiu-Jitsu e sem "todas as modalidades"', () => {
+  assert.equal(PLAN_EXCLUSION_NOTE, 'Todas as modalidades incluídas, exceto Jiu-Jitsu.');
+  for (const p of PLANS) assert.ok(!p.features.some((f) => /todas as modalidades/i.test(f)));
+});
+
+test('Jiu-Jitsu: planos independentes, valores e mensagens de WhatsApp exatos', () => {
+  const [adulto, infantil] = JIU_JITSU_PLANS;
+  assert.equal(adulto.price, 'R$ 206,00');
+  assert.equal(infantil.price, 'R$ 166,00');
+  assert.equal(
+    new URL(buildWhatsAppLink(adulto.whatsappMessage)).searchParams.get('text'),
+    'Olá! Tenho interesse no plano de Jiu-Jitsu adulto da Apollo Body & Health, no valor de R$ 206,00 mensais. Gostaria de receber informações sobre horários e matrícula.',
+  );
+  assert.equal(
+    new URL(buildWhatsAppLink(infantil.whatsappMessage)).searchParams.get('text'),
+    'Olá! Tenho interesse no plano de Jiu-Jitsu infantil da Apollo Body & Health, no valor de R$ 166,00 mensais. Gostaria de receber informações sobre horários, faixa etária e matrícula.',
+  );
+  const faq = FAQ.find((f) => f.question === 'O Jiu-Jitsu está incluído nos planos tradicionais da academia?');
+  assert.ok(faq?.answer[0].startsWith('Não. O Jiu-Jitsu possui mensalidade independente.'));
 });

@@ -26,7 +26,14 @@ export const FAQ: FaqItem[] = [
     question: 'Como funcionam os planos mensal, semestral e anual?',
     answer: [
       'Temos três opções: Ouro Mensal (R$ 149,00 por mês, com taxa de matrícula de R$ 39,00), Ouro+ Semestral (R$ 720,00 em até 6 vezes no cartão, referência mensal de R$ 120,00) e Club+ Apollo (R$ 1.176,00 em até 12 vezes no cartão, referência mensal de R$ 98,00).',
-      'Os benefícios de cada plano estão detalhados na seção Planos. Para condições de pagamento, regras de utilização e elegibilidade das modalidades, fale com a nossa equipe.',
+      'Todas as modalidades estão incluídas nesses planos, exceto Jiu-Jitsu, que tem mensalidade independente. Os benefícios de cada plano estão detalhados na seção Planos. Para condições de pagamento, regras de utilização e elegibilidade das modalidades, fale com a nossa equipe.',
+    ],
+    cta: true,
+  },
+  {
+    question: 'O Jiu-Jitsu está incluído nos planos tradicionais da academia?',
+    answer: [
+      'Não. O Jiu-Jitsu possui mensalidade independente. O plano adulto custa R$ 206,00 por mês e o plano infantil custa R$ 166,00 por mês. Entre em contato com nossa equipe para consultar horários e condições de matrícula.',
     ],
     cta: true,
   },
