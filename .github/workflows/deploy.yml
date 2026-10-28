@@ -18,7 +18,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      PUBLIC_SITE_URL: https://www.academiaapollo.com.br
+      PUBLIC_SITE_URL: https://academiaapollo.com.br
       PUBLIC_BASE_PATH: /
     steps:
       - name: Checkout
