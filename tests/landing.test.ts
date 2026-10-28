@@ -73,7 +73,7 @@ test('Planos: valores e benefícios conforme a arte oficial', () => {
 });
 
 test('Localização e vídeo: link oficial; vídeo vazio por padrão', () => {
-  assert.equal(LOCATION.mapsUrl, 'https://maps.app.goo.gl/3HAEsdgrbMUy8EJZ6');
+  assert.equal(LOCATION.mapsUrl, 'https://maps.app.goo.gl/73vmZQxNDrQsaWcB8');
   assert.equal(LOCATION.address, '');
   assert.equal(YOUTUBE_VIDEO_ID, '');
 });

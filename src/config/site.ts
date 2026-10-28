@@ -49,7 +49,7 @@ export const CONTACT = {
 /** LOCALIZAÇÃO — somente o link oficial fornecido. Não há endereço/coordenadas confirmados. */
 export const LOCATION = {
   /** Link oficial do Google Maps fornecido pela academia. */
-  mapsUrl: 'https://maps.app.goo.gl/3HAEsdgrbMUy8EJZ6',
+  mapsUrl: 'https://maps.app.goo.gl/73vmZQxNDrQsaWcB8',
   /**
    * URL de incorporação oficial do Google Maps (Compartilhar > Incorporar um mapa > copiar o "src" do iframe).
    * Enquanto estiver vazio, o mapa incorporado não é exibido e os botões continuam funcionando.
