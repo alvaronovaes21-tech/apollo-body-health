@@ -1,0 +1,29 @@
+---
+import SectionHeading from './SectionHeading.astro';
+import YouTubeVideo from './YouTubeVideo.astro';
+import { SECTIONS, YOUTUBE_VIDEO_ID } from '@/config/site';
+---
+
+<section class="section video-section" id={SECTIONS.video} aria-labelledby="video-title">
+  <div class="container">
+    <SectionHeading
+      eyebrow="Vídeo de apresentação"
+      title="Conheça a Apollo <em>antes mesmo de chegar.</em>"
+      subtitle="Veja de perto nosso espaço, nossa proposta e a experiência de treinar na Apollo Body & Health."
+      id="video-title"
+    />
+    <div class="video-section__wrap" data-reveal>
+      <YouTubeVideo videoId={YOUTUBE_VIDEO_ID} />
+    </div>
+  </div>
+</section>
+
+<style>
+  .video-section {
+    background: radial-gradient(60% 50% at 50% 0%, rgb(25 195 255 / 0.08), transparent 70%), var(--bg);
+  }
+  .video-section__wrap {
+    max-width: 62rem;
+    margin-inline: auto;
+  }
+</style>

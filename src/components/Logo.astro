@@ -1,0 +1,70 @@
+---
+import { resolveImage } from '@/lib/images';
+import { SITE } from '@/config/site';
+
+/**
+ * Logomarca oficial.
+ * Salve o arquivo original em src/assets/images/brand/logo-apollo.(svg|png|webp).
+ * O arquivo é exibido sem recorte, sem redesenho e mantendo a proporção original.
+ * Enquanto o arquivo não existir, é exibido apenas o nome da marca em texto
+ * (o símbolo "A" NÃO é recriado para não alterar a identidade oficial).
+ */
+interface Props {
+  /** Altura em pixels da logomarca. */
+  height?: number;
+  class?: string;
+  /** Prioridade de carregamento (true no cabeçalho). */
+  priority?: boolean;
+}
+const { height = 40, class: className, priority = false } = Astro.props;
+const logo = resolveImage('brand', 'logo-apollo');
+const width = logo ? Math.round((logo.image.width / logo.image.height) * height) : undefined;
+---
+
+{
+  logo ? (
+    <img
+      class:list={['logo-img', className]}
+      src={logo.image.src}
+      width={width}
+      height={height}
+      alt={`${SITE.name} — logomarca`}
+      decoding="async"
+      loading={priority ? 'eager' : 'lazy'}
+      style={`height:${height}px;width:auto`}
+    />
+  ) : (
+    <span class:list={['logo-text', className]} style={`--logo-h:${height}px`}>
+      <span class="logo-text__name">APOLLO</span>
+      <span class="logo-text__sub">BODY &amp; HEALTH</span>
+    </span>
+  )
+}
+
+<style>
+  .logo-img {
+    display: block;
+    max-width: none;
+    object-fit: contain;
+  }
+  .logo-text {
+    display: inline-flex;
+    flex-direction: column;
+    line-height: 1;
+    gap: 0.28em;
+    font-family: var(--font-display);
+    font-size: calc(var(--logo-h, 40px) * 0.5);
+    text-transform: uppercase;
+  }
+  .logo-text__name {
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    color: var(--text);
+  }
+  .logo-text__sub {
+    font-weight: 600;
+    font-size: 0.5em;
+    letter-spacing: 0.34em;
+    color: var(--cyan);
+  }
+</style>

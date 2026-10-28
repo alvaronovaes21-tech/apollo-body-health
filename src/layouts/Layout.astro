@@ -1,0 +1,118 @@
+---
+import '@/styles/global.css';
+import Analytics from '@/components/Analytics.astro';
+import { ANALYTICS, CONTACT, LOCATION, SITE, SOCIAL } from '@/config/site';
+import { FAQ } from '@/data/faq';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Caminho canônico (padrão: "/"). */
+  path?: string;
+}
+
+const { title = SITE.seo.title, description = SITE.seo.description, path = '/' } = Astro.props;
+
+const base = SITE.url || '';
+const canonical = base ? `${base}${path === '/' ? '/' : path}` : undefined;
+// Caminho base do deploy (ex.: /apollo-body-health/ no GitHub Pages; "/" em domínio próprio).
+const basePath = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+// Caminho de um arquivo de /public respeitando o base.
+const asset = (p: string) => `${basePath}${p.replace(/^\//, '')}`;
+// URL absoluta: PUBLIC_SITE_URL já deve incluir o caminho base quando houver (ex.: .../apollo-body-health).
+const absolute = (p: string) => (base ? `${base}${p}` : asset(p));
+const ogImage = absolute(SITE.seo.ogImage);
+
+// Dados estruturados: somente informações verificadas (nome, cidade/UF, telefone, link do Maps).
+const organization: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'ExerciseGym',
+  name: SITE.name,
+  description,
+  telephone: `+${CONTACT.whatsappNumber}`,
+  hasMap: LOCATION.mapsUrl,
+  areaServed: { '@type': 'City', name: SITE.city },
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: SITE.city,
+    addressRegion: SITE.region,
+    addressCountry: SITE.country,
+    ...(LOCATION.address ? { streetAddress: LOCATION.address } : {}),
+  },
+  ...(base ? { url: `${base}/`, image: ogImage } : {}),
+  ...(SOCIAL.instagramUrl ? { sameAs: [SOCIAL.instagramUrl] } : {}),
+};
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: FAQ.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: { '@type': 'Answer', text: item.answer.join(' ') },
+  })),
+};
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content={SITE.seo.themeColor} />
+    <meta name="color-scheme" content="dark" />
+    {canonical && <link rel="canonical" href={canonical} />}
+    <link rel="icon" href={asset('favicon.svg')} type="image/svg+xml" />
+    <link rel="sitemap" type="application/xml" href={asset('sitemap.xml')} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:alt" content={SITE.seo.ogImageAlt} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="geo.region" content="BR-BA" />
+    <meta name="geo.placename" content={SITE.city} />
+
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+
+    <Analytics />
+
+    <script type="application/ld+json" set:html={JSON.stringify(organization)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqLd)} />
+  </head>
+  <body>
+    <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+    {
+      ANALYTICS.gtmId && (
+        <noscript>
+          <iframe
+            src={`https://www.googletagmanager.com/ns.html?id=${ANALYTICS.gtmId}`}
+            height="0"
+            width="0"
+            style="display:none;visibility:hidden"
+            title="Google Tag Manager"
+          />
+        </noscript>
+      )
+    }
+    <slot />
+
+    <script>
+      import '@/scripts/tracking.ts';
+      import '@/scripts/ui.ts';
+    </script>
+  </body>
+</html>

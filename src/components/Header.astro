@@ -1,0 +1,229 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import WhatsAppButton from './WhatsAppButton.astro';
+import { NAV_ITEMS } from '@/data/navigation';
+import { MESSAGES } from '@/lib/messages';
+import { SECTIONS } from '@/config/site';
+---
+
+<header class="header" data-header>
+  <div class="container header__bar">
+    <a class="header__brand" href={`#${SECTIONS.inicio}`} aria-label="Apollo Body & Health, início">
+      <Logo height={40} priority />
+    </a>
+
+    <nav class="header__nav" aria-label="Navegação principal">
+      <ul id="menu-principal" data-menu>
+        {
+          NAV_ITEMS.map((item) => (
+            <li>
+              <a href={item.href} data-nav-link>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+        <li class="header__cta-mobile">
+          <WhatsAppButton
+            message={MESSAGES.general}
+            origin="header-menu-mobile"
+            category="general"
+            size="lg"
+            block
+          >
+            Quero conhecer a Apollo
+          </WhatsAppButton>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="header__actions">
+      <WhatsAppButton message={MESSAGES.general} origin="header" category="general" class="header__cta">
+        Quero conhecer a Apollo
+      </WhatsAppButton>
+      <button
+        type="button"
+        class="header__toggle"
+        data-menu-toggle
+        aria-expanded="false"
+        aria-controls="menu-principal"
+        aria-label="Abrir menu"
+      >
+        <span class="header__toggle-open"><Icon name="menu" size={26} /></span>
+        <span class="header__toggle-close"><Icon name="close" size={26} /></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<style>
+  .header {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 100;
+    height: var(--header-h);
+  }
+  /* O desfoque fica em um pseudo-elemento: backdrop-filter no próprio header quebraria o painel fixo do menu móvel. */
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: 0;
+    background: rgb(5 8 13 / 0.82);
+    border-bottom: 1px solid var(--line);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    transition: opacity 0.3s var(--ease);
+  }
+  .header[data-scrolled]::before,
+  .header[data-menu-open]::before {
+    opacity: 1;
+  }
+  .header__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    height: 100%;
+  }
+  .header__brand {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    border-radius: 8px;
+    text-decoration: none;
+  }
+
+  /* Navegação móvel (painel) */
+  .header__nav ul {
+    position: fixed;
+    inset: var(--header-h) 0 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 1.25rem 1.25rem 2rem;
+    overflow-y: auto;
+    background: #05080d;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition:
+      opacity 0.25s var(--ease),
+      transform 0.25s var(--ease),
+      visibility 0s linear 0.25s;
+  }
+  .header[data-menu-open] .header__nav ul {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    transition-delay: 0s;
+  }
+  .header__nav li:not(.header__cta-mobile) a {
+    display: flex;
+    align-items: center;
+    min-height: 56px;
+    padding: 0 0.5rem;
+    border-bottom: 1px solid var(--line);
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--text);
+  }
+  .header__cta-mobile {
+    margin-top: 1.25rem;
+  }
+
+  .header__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .header__actions :global(.header__cta) {
+    display: none;
+  }
+  .header__toggle {
+    display: inline-grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border: 1px solid var(--line-strong);
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.04);
+    cursor: pointer;
+  }
+  .header__toggle-close {
+    display: none;
+  }
+  .header[data-menu-open] .header__toggle-open {
+    display: none;
+  }
+  .header[data-menu-open] .header__toggle-close {
+    display: block;
+  }
+
+  @media (min-width: 980px) {
+    .header__toggle,
+    .header__cta-mobile {
+      display: none;
+    }
+    .header__nav ul {
+      position: static;
+      flex-direction: row;
+      align-items: center;
+      gap: 0.15rem;
+      padding: 0;
+      overflow: visible;
+      background: none;
+      visibility: visible;
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+    .header__nav li:not(.header__cta-mobile) a {
+      position: relative;
+      min-height: 44px;
+      padding: 0 0.7rem;
+      border: 0;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--muted);
+      transition: color 0.2s var(--ease);
+    }
+    .header__nav li:not(.header__cta-mobile) a::after {
+      content: '';
+      position: absolute;
+      left: 0.7rem;
+      right: 0.7rem;
+      bottom: 6px;
+      height: 2px;
+      border-radius: 2px;
+      background: var(--cyan);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s var(--ease);
+    }
+    .header__nav li:not(.header__cta-mobile) a:hover,
+    .header__nav li:not(.header__cta-mobile) a[aria-current='true'] {
+      color: var(--text);
+    }
+    .header__nav li:not(.header__cta-mobile) a:hover::after,
+    .header__nav li:not(.header__cta-mobile) a[aria-current='true']::after {
+      transform: scaleX(1);
+    }
+    .header__actions :global(.header__cta) {
+      display: inline-flex;
+      min-height: 44px;
+      padding-inline: 1.1rem;
+      font-size: 0.88rem;
+    }
+  }
+
+  /* Evita rolagem do fundo com o menu aberto */
+  :global(html[data-menu-lock]) {
+    overflow: hidden;
+  }
+</style>

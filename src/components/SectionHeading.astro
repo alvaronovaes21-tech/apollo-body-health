@@ -1,0 +1,78 @@
+﻿---
+interface Props {
+  eyebrow?: string;
+  title: string;
+  subtitle?: string;
+  id?: string;
+  align?: 'left' | 'center';
+  /** "dark" usa texto escuro (para fundos claros/ciano). */
+  tone?: 'light' | 'dark';
+  level?: 2 | 3;
+}
+const { eyebrow, title, subtitle, id, align = 'center', tone = 'light', level = 2 } = Astro.props;
+const Tag = `h${level}` as 'h2' | 'h3';
+---
+
+<header class:list={['heading', `heading--${align}`, `heading--${tone}`]} data-reveal>
+  {eyebrow && <p class="heading__eyebrow">{eyebrow}</p>}
+  <Tag class="heading__title" id={id} set:html={title} />
+  {subtitle && <p class="heading__subtitle">{subtitle}</p>}
+</header>
+
+<style>
+  .heading {
+    max-width: 46rem;
+    margin-bottom: clamp(2rem, 5vw, 3.5rem);
+  }
+  .heading--center {
+    margin-inline: auto;
+    text-align: center;
+  }
+  .heading__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 0 0 1rem;
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cyan);
+  }
+  .heading__eyebrow::before {
+    content: '';
+    width: 1.75rem;
+    height: 1px;
+    background: currentColor;
+  }
+  .heading--center .heading__eyebrow::after {
+    content: '';
+    width: 1.75rem;
+    height: 1px;
+    background: currentColor;
+  }
+  .heading__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.9rem, 1.2rem + 3.2vw, 3.1rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .heading__title :global(em) {
+    font-style: normal;
+    color: var(--cyan);
+  }
+  .heading__subtitle {
+    margin: 1.1rem 0 0;
+    color: var(--muted);
+    font-size: clamp(1rem, 0.95rem + 0.3vw, 1.15rem);
+    text-wrap: pretty;
+  }
+  .heading--dark .heading__eyebrow,
+  .heading--dark .heading__subtitle {
+    color: #052033;
+  }
+</style>

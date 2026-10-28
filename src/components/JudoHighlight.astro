@@ -1,0 +1,249 @@
+---
+import Photo from './Photo.astro';
+import Icon from './Icon.astro';
+import WhatsAppButton from './WhatsAppButton.astro';
+import { JUDO } from '@/data/judo';
+import { SECTIONS } from '@/config/site';
+---
+
+<section class="judo" id={SECTIONS.judo} aria-labelledby="judo-title">
+  <div class="judo__bg" aria-hidden="true"></div>
+  <div class="container judo__grid">
+    <div class="judo__content" data-reveal>
+      <p class="judo__badge">
+        <span class="judo__pulse" aria-hidden="true"></span>
+        Turmas em formação
+      </p>
+      <h2 id="judo-title" class="judo__title">{JUDO.title}</h2>
+      <p class="judo__subtitle">{JUDO.subtitle}</p>
+
+      <dl class="judo__facts">
+        <div class="fact">
+          <dt><Icon name="users" size={18} /> Público</dt>
+          <dd>{JUDO.audience}</dd>
+        </div>
+        <div class="fact">
+          <dt><Icon name="calendar" size={18} /> Dias</dt>
+          <dd>{JUDO.days}</dd>
+        </div>
+        {
+          JUDO.classes.map((c) => (
+            <div class="fact">
+              <dt>
+                <Icon name="clock" size={18} /> {c.label}
+              </dt>
+              <dd>{c.time}</dd>
+            </div>
+          ))
+        }
+        {
+          JUDO.ageRange && (
+            <div class="fact">
+              <dt>Faixa etária</dt>
+              <dd>{JUDO.ageRange}</dd>
+            </div>
+          )
+        }
+        <div class="fact fact--price">
+          <dt>Mensalidade</dt>
+          <dd>{JUDO.price}</dd>
+        </div>
+      </dl>
+
+      <p class="judo__highlight">{JUDO.highlight}</p>
+
+      <div class="judo__cta">
+        <WhatsAppButton
+          message={JUDO.whatsappMessage}
+          origin="judo"
+          category="judo"
+          item="Judô infantil e juvenil"
+          variant="dark"
+          size="lg"
+        >
+          {JUDO.cta}
+        </WhatsAppButton>
+        <p class="judo__note">Faixa etária atendida e vagas: confirme com a equipe.</p>
+      </div>
+    </div>
+
+    <div class="judo__photo" data-reveal style="--reveal-delay:120ms">
+      <!-- Foto real: src/assets/images/judo/judo.jpg -->
+      <Photo
+        folder="judo"
+        name="judo"
+        fallback="judo-infantil"
+        alt={JUDO.imageAlt}
+        sizes="(min-width: 980px) 520px, 92vw"
+        widths={[480, 768, 1080, 1440]}
+        position="50% 45%"
+      />
+    </div>
+  </div>
+</section>
+
+<style>
+  .judo {
+    position: relative;
+    isolation: isolate;
+    padding-block: var(--section-y);
+    color: #031018;
+    overflow: hidden;
+  }
+  .judo__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(70% 90% at 100% 0%, rgb(255 255 255 / 0.28), transparent 60%),
+      radial-gradient(60% 80% at 0% 100%, rgb(2 60 90 / 0.35), transparent 70%),
+      linear-gradient(135deg, #2fd0ff 0%, #12b4ee 45%, #0a8fc4 100%);
+  }
+  .judo__grid {
+    display: grid;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
+  }
+  .judo__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1.25rem;
+    padding: 0.45rem 1rem;
+    border-radius: 999px;
+    background: #03080d;
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .judo__pulse {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 0 0 rgb(25 195 255 / 0.7);
+    animation: pulse 2.2s infinite;
+  }
+  @keyframes pulse {
+    70% {
+      box-shadow: 0 0 0 9px rgb(25 195 255 / 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgb(25 195 255 / 0);
+    }
+  }
+  .judo__title {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(1.95rem, 1.2rem + 3.4vw, 3.3rem);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+  .judo__subtitle {
+    margin-top: 1rem;
+    max-width: 34rem;
+    font-size: clamp(1rem, 0.95rem + 0.3vw, 1.15rem);
+    color: #052033;
+  }
+  .judo__facts {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.65rem;
+    margin-top: 1.75rem;
+  }
+  .fact {
+    padding: 0.85rem 1rem;
+    border-radius: 16px;
+    background: rgb(3 8 13 / 0.9);
+    color: #fff;
+  }
+  .fact dt {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.2rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--cyan);
+  }
+  .fact dd {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.3;
+  }
+  .fact--price {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    color: #031018;
+  }
+  .fact--price dt {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #052033;
+  }
+  .fact--price dd {
+    font-weight: 800;
+    font-size: clamp(1.6rem, 1.3rem + 1.2vw, 2.1rem);
+    letter-spacing: -0.02em;
+  }
+  .judo__highlight {
+    margin-top: 1.5rem;
+    padding-left: 1rem;
+    border-left: 4px solid #031018;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.1rem, 1rem + 0.6vw, 1.35rem);
+    line-height: 1.3;
+  }
+  .judo__cta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.9rem;
+    margin-top: 1.5rem;
+  }
+  .judo__cta :global(.btn) {
+    width: 100%;
+  }
+  .judo__note {
+    font-size: 0.85rem;
+    color: #052033;
+  }
+  .judo__photo {
+    position: relative;
+    aspect-ratio: 4 / 4.2;
+    border-radius: 28px;
+    overflow: hidden;
+    border: 6px solid rgb(3 8 13 / 0.92);
+    box-shadow: 0 40px 70px -30px rgb(2 30 48 / 0.7);
+  }
+
+  @media (min-width: 560px) {
+    .judo__cta :global(.btn) {
+      width: auto;
+    }
+  }
+  @media (min-width: 980px) {
+    .judo__grid {
+      grid-template-columns: 1.1fr 0.9fr;
+    }
+    .judo__photo {
+      aspect-ratio: 4 / 5;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .judo__pulse {
+      animation: none;
+    }
+  }
+</style>

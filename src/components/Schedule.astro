@@ -1,0 +1,199 @@
+---
+import SectionHeading from './SectionHeading.astro';
+import WhatsAppButton from './WhatsAppButton.astro';
+import { MODALITIES } from '@/data/modalities';
+import { JUDO } from '@/data/judo';
+import { MESSAGES } from '@/lib/messages';
+import { SECTIONS } from '@/config/site';
+
+/**
+ * Quadro consolidado de horários — gerado a partir de src/data/modalities.ts e src/data/judo.ts.
+ * Os valores são exibidos exatamente como informados (sem duração presumida, sem vagas).
+ */
+const rows = MODALITIES.flatMap((m) =>
+  m.schedule.map((s, i) => ({
+    key: `${m.id}-${i}`,
+    modality: m.name,
+    note: m.note,
+    first: i === 0,
+    span: m.schedule.length,
+    days: s.days,
+    time: s.time,
+  })),
+);
+---
+
+<section class="section schedule" id={SECTIONS.horarios} aria-labelledby="schedule-title">
+  <div class="container">
+    <SectionHeading
+      eyebrow="Horários"
+      title="Treino que se encaixa <em>na sua semana.</em>"
+      subtitle="Confira os dias e horários de cada modalidade. Para confirmar turmas e vagas, fale com nossa equipe."
+      id="schedule-title"
+    />
+
+    <div class="schedule__table-wrap card" data-reveal>
+      <table class="schedule__table">
+        <caption class="sr-only">Quadro de horários por modalidade</caption>
+        <thead>
+          <tr>
+            <th scope="col">Modalidade</th>
+            <th scope="col">Dias</th>
+            <th scope="col">Horário</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            rows.map((r) => (
+              <tr class:list={{ 'is-first': r.first }}>
+                {r.first && (
+                  <th scope="row" rowspan={r.span}>
+                    {r.modality}
+                    {r.note && <span class="schedule__note">{r.note}</span>}
+                  </th>
+                )}
+                <td data-label="Dias">{r.days}</td>
+                <td data-label="Horário" class="schedule__time">
+                  {r.time}
+                </td>
+              </tr>
+            ))
+          }
+          <tr class="schedule__judo is-first">
+            <th scope="row" rowspan={JUDO.classes.length}>
+              Judô infantil e juvenil
+              <span class="schedule__note">turmas em formação</span>
+            </th>
+            <td data-label="Dias">{JUDO.days} · {JUDO.classes[0].label}</td>
+            <td data-label="Horário" class="schedule__time">{JUDO.classes[0].time}</td>
+          </tr>
+          <tr class="schedule__judo">
+            <td data-label="Dias">{JUDO.days} · {JUDO.classes[1].label}</td>
+            <td data-label="Horário" class="schedule__time">{JUDO.classes[1].time}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="schedule__cta" data-reveal>
+      <WhatsAppButton message={MESSAGES.general} origin="horarios" category="general" variant="secondary">
+        Confirmar horários com a equipe
+      </WhatsAppButton>
+    </div>
+  </div>
+</section>
+
+<style>
+  .schedule {
+    background: linear-gradient(180deg, var(--bg) 0%, var(--bg-soft) 100%);
+  }
+  .schedule__table-wrap {
+    overflow: hidden;
+  }
+  .schedule__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.96rem;
+  }
+  thead th {
+    padding: 1rem 1.25rem;
+    text-align: left;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    background: rgb(25 195 255 / 0.06);
+    border-bottom: 1px solid var(--line);
+  }
+  tbody th,
+  tbody td {
+    padding: 0.9rem 1.25rem;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--line);
+  }
+  tbody th {
+    font-family: var(--font-display);
+    font-weight: 600;
+    border-right: 1px solid var(--line);
+    background: rgb(255 255 255 / 0.02);
+    min-width: 11rem;
+  }
+  tbody tr:last-child td,
+  tbody tr:last-child th {
+    border-bottom: 0;
+  }
+  .schedule__note {
+    display: block;
+    margin-top: 0.15rem;
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .schedule__time {
+    font-family: var(--font-display);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .schedule__judo th {
+    color: #031018;
+    background: var(--cyan);
+  }
+  .schedule__judo th .schedule__note {
+    color: #052033;
+  }
+  .schedule__cta {
+    margin-top: 2rem;
+    text-align: center;
+  }
+
+  /* Celular: linhas viram blocos empilhados, mantendo a semântica da tabela */
+  @media (max-width: 719px) {
+    thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+    .schedule__table,
+    .schedule__table tbody {
+      display: block;
+    }
+    .schedule__table tr {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      column-gap: 1rem;
+      padding: 0.35rem 0;
+    }
+    tbody th {
+      grid-column: 1 / -1;
+      display: block;
+      border: 0;
+      background: none;
+      padding: 1rem 1.1rem 0.25rem;
+      min-width: 0;
+      font-size: 1.05rem;
+    }
+    tbody tr:not(.is-first) {
+      border-top: 0;
+    }
+    tbody td {
+      border: 0;
+      padding: 0.3rem 1.1rem;
+    }
+    tbody td:last-child {
+      text-align: right;
+    }
+    tr.is-first {
+      border-top: 1px solid var(--line);
+    }
+    tr.is-first:first-child {
+      border-top: 0;
+    }
+    .schedule__judo th {
+      border-radius: 0;
+    }
+  }
+</style>

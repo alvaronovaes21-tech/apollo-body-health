@@ -1,0 +1,75 @@
+---
+import Icon from './Icon.astro';
+import { buildWhatsAppLink } from '@/lib/whatsapp';
+import { MESSAGES } from '@/lib/messages';
+---
+
+<a
+  class="wa-float"
+  href={buildWhatsAppLink(MESSAGES.general)}
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label="Falar com a Apollo pelo WhatsApp (abre em nova aba)"
+  data-track="whatsapp"
+  data-origin="botao-flutuante"
+  data-category="general"
+>
+  <Icon name="whatsapp" size={28} />
+  <span class="wa-float__label">Falar com a Apollo</span>
+</a>
+
+<style>
+  .wa-float {
+    position: fixed;
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    z-index: 90;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-width: 58px;
+    height: 58px;
+    padding: 0 15px;
+    border-radius: 999px;
+    color: #021018;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.92rem;
+    text-decoration: none;
+    background: linear-gradient(135deg, #3fd2ff, #12b4ee);
+    box-shadow:
+      0 14px 34px -8px rgb(25 195 255 / 0.65),
+      0 0 0 1px rgb(255 255 255 / 0.2) inset;
+    transition:
+      transform 0.25s var(--ease),
+      box-shadow 0.25s var(--ease);
+  }
+  .wa-float:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 20px 40px -8px rgb(25 195 255 / 0.8),
+      0 0 0 1px rgb(255 255 255 / 0.3) inset;
+  }
+  .wa-float:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 3px;
+  }
+  .wa-float__label {
+    display: none;
+    white-space: nowrap;
+    padding-right: 4px;
+  }
+  @media (min-width: 900px) {
+    .wa-float__label {
+      display: inline;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wa-float {
+      transition: none;
+    }
+    .wa-float:hover {
+      transform: none;
+    }
+  }
+</style>

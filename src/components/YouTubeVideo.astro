@@ -1,0 +1,178 @@
+---
+import Photo from './Photo.astro';
+import Icon from './Icon.astro';
+
+/**
+ * Vídeo do YouTube com carregamento sob demanda ("facade"): o player só é baixado após o clique.
+ *  - Com videoId válido: miniatura + botão de reprodução (acessível por teclado) -> iframe responsivo 16:9.
+ *  - Sem videoId: capa provisória + aviso discreto "em breve" (nunca mostra um player quebrado).
+ * Capa personalizada: src/assets/images/video/capa.jpg
+ */
+interface Props {
+  videoId?: string;
+  title?: string;
+}
+const { videoId = '', title = 'Vídeo de apresentação da Apollo Body & Health' } = Astro.props;
+
+// Aceita somente IDs no formato do YouTube (letras, números, "-" e "_").
+const id = /^[A-Za-z0-9_-]{6,20}$/.test(videoId.trim()) ? videoId.trim() : '';
+---
+
+<div class="video" data-video data-video-id={id || undefined} data-video-title={title}>
+  <div class="video__frame">
+    <Photo
+      folder="video"
+      name="capa"
+      fallback="video-capa"
+      alt="Capa do vídeo de apresentação da Apollo Body & Health"
+      sizes="(min-width: 1040px) 960px, 92vw"
+      widths={[640, 960, 1280, 1600]}
+      badge={false}
+    />
+    <div class="video__shade" aria-hidden="true"></div>
+
+    {
+      id ? (
+        <button type="button" class="video__play" data-video-play aria-label={`Reproduzir: ${title}`}>
+          <span class="video__play-icon">
+            <Icon name="play" size={34} />
+          </span>
+          <span class="video__play-label">Assistir ao vídeo</span>
+        </button>
+      ) : (
+        <div class="video__soon" role="status">
+          <span class="video__play-icon video__play-icon--off" aria-hidden="true">
+            <Icon name="play" size={34} />
+          </span>
+          <p>O vídeo de apresentação será disponibilizado em breve.</p>
+        </div>
+      )
+    }
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-video][data-video-id]').forEach((root) => {
+    const button = root.querySelector<HTMLButtonElement>('[data-video-play]');
+    const frame = root.querySelector<HTMLElement>('.video__frame');
+    const id = root.dataset.videoId;
+    if (!button || !frame || !id) return;
+
+    button.addEventListener(
+      'click',
+      () => {
+        const iframe = document.createElement('iframe');
+        iframe.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
+        iframe.title = root.dataset.videoTitle ?? 'Vídeo';
+        iframe.allow =
+          'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+        iframe.allowFullscreen = true;
+        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+        iframe.className = 'video__iframe';
+        frame.replaceChildren(iframe);
+        iframe.focus();
+        // Evento medido uma única vez por carregamento (ver src/scripts/tracking.ts)
+        document.dispatchEvent(new CustomEvent('apollo:video-play', { detail: { videoId: id } }));
+      },
+      { once: true },
+    );
+  });
+</script>
+
+<style>
+  .video {
+    width: 100%;
+  }
+  .video__frame {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 24px;
+    border: 1px solid var(--line-strong);
+    background: #000;
+    box-shadow: 0 40px 80px -40px rgb(25 195 255 / 0.35);
+  }
+  .video__shade {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(60% 60% at 50% 50%, rgb(5 8 13 / 0.2), rgb(5 8 13 / 0.72)),
+      linear-gradient(180deg, rgb(5 8 13 / 0.2), rgb(5 8 13 / 0.55));
+    pointer-events: none;
+  }
+  .video__play,
+  .video__soon {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+    text-align: center;
+  }
+  .video__play {
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+  .video__play-icon {
+    display: grid;
+    place-items: center;
+    width: clamp(68px, 10vw, 92px);
+    height: clamp(68px, 10vw, 92px);
+    padding-left: 5px;
+    border-radius: 50%;
+    color: #021018;
+    background: var(--cyan);
+    box-shadow:
+      0 0 0 10px rgb(25 195 255 / 0.2),
+      0 20px 40px -10px rgb(25 195 255 / 0.6);
+    transition: transform 0.3s var(--ease);
+  }
+  .video__play-icon :global(svg) {
+    fill: currentColor;
+  }
+  .video__play:hover .video__play-icon {
+    transform: scale(1.08);
+  }
+  .video__play:focus-visible {
+    outline: 3px solid var(--cyan);
+    outline-offset: -8px;
+    border-radius: 24px;
+  }
+  .video__play-label {
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: #fff;
+  }
+  .video__play-icon--off {
+    color: rgb(255 255 255 / 0.75);
+    background: rgb(5 8 13 / 0.6);
+    border: 1px solid var(--line-strong);
+    box-shadow: none;
+  }
+  .video__soon p {
+    max-width: 22rem;
+    padding: 0.55rem 1.1rem;
+    border-radius: 999px;
+    background: rgb(5 8 13 / 0.7);
+    border: 1px solid var(--line-strong);
+    backdrop-filter: blur(8px);
+    font-size: 0.9rem;
+    color: #fff;
+  }
+  .video :global(.video__iframe) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .video__play-icon {
+      transition: none;
+    }
+  }
+</style>

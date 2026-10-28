@@ -1,0 +1,108 @@
+﻿---
+import { ANALYTICS } from '@/config/site';
+
+/**
+ * Preparação para Google Tag Manager, GA4 e Google Ads.
+ * - Nenhum ID é inventado: sem IDs configurados (.env), nada é carregado e a página funciona normalmente.
+ * - Se houver GTM, ele gerencia GA4/Ads. GA4/Ads diretos só são carregados quando NÃO há GTM.
+ * - Consent Mode v2: com PUBLIC_CONSENT_MODE=true o consentimento começa "negado" e deve ser
+ *   atualizado via window.apolloConsent.grant() / .deny() / .update({...}) (ver docs/MENSURACAO.md).
+ * - window.apolloTrack(nome, parâmetros) é a única porta de saída de eventos (sem duplicidade).
+ */
+const { gtmId, ga4Id, googleAdsId, consentMode } = ANALYTICS;
+const useGtm = Boolean(gtmId);
+const gtagIds = useGtm ? [] : [ga4Id, googleAdsId].filter(Boolean);
+const firstGtagId = gtagIds[0] ?? '';
+const config = { gtmId, gtagIds, consentMode, useGtm };
+---
+
+<script is:inline define:vars={{ config }}>
+  (function () {
+    var w = window;
+    w.dataLayer = w.dataLayer || [];
+    function gtag() {
+      w.dataLayer.push(arguments);
+    }
+    w.gtag = w.gtag || gtag;
+
+    var debug =
+      /[?&]apollo_debug=1/.test(w.location.search) ||
+      (w.localStorage && w.localStorage.getItem('apollo_debug') === '1');
+
+    // Consent Mode v2: padrão "negado" (se habilitado) ANTES de qualquer tag ser carregada.
+    if (config.consentMode) {
+      gtag('consent', 'default', {
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        analytics_storage: 'denied',
+        wait_for_update: 500,
+      });
+    }
+
+    function applyConsent(state) {
+      gtag('consent', 'update', state);
+    }
+    w.apolloConsent = {
+      /** Concede todas as finalidades. Chame após o aceite do visitante. */
+      grant: function () {
+        applyConsent({
+          ad_storage: 'granted',
+          ad_user_data: 'granted',
+          ad_personalization: 'granted',
+          analytics_storage: 'granted',
+        });
+      },
+      /** Nega todas as finalidades. */
+      deny: function () {
+        applyConsent({
+          ad_storage: 'denied',
+          ad_user_data: 'denied',
+          ad_personalization: 'denied',
+          analytics_storage: 'denied',
+        });
+      },
+      /** Atualização granular: update({ analytics_storage: 'granted', ad_storage: 'denied' }) */
+      update: applyConsent,
+    };
+
+    /** Envia um evento. Com GTM -> dataLayer; com gtag direto -> gtag('event'). Sem IDs -> só debug. */
+    w.apolloTrack = function (name, params) {
+      params = params || {};
+      if (debug && w.console) console.info('[apollo:event]', name, params);
+      if (config.useGtm) {
+        w.dataLayer.push(Object.assign({ event: name }, params));
+      } else if (config.gtagIds.length) {
+        gtag('event', name, params);
+      }
+    };
+
+    if (config.useGtm) {
+      w.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' });
+    } else if (config.gtagIds.length) {
+      gtag('js', new Date());
+      config.gtagIds.forEach(function (id) {
+        gtag('config', id);
+      });
+    }
+  })();
+</script>
+
+{
+  useGtm && (
+    <script is:inline define:vars={{ gtmId }}>
+      (function () {
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtm.js?id=' + encodeURIComponent(gtmId);
+        document.head.appendChild(s);
+      })();
+    </script>
+  )
+}
+
+{
+  !useGtm && firstGtagId && (
+    <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${firstGtagId}`} />
+  )
+}

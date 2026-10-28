@@ -1,0 +1,123 @@
+---
+import Icon from './Icon.astro';
+import WhatsAppButton from './WhatsAppButton.astro';
+import { MESSAGES } from '@/lib/messages';
+import { SECTIONS } from '@/config/site';
+
+// Os nomes das plataformas são exibidos em texto. Para usar logotipos, é necessário ter os arquivos
+// oficiais/autorizados (ver README: "Wellhub e TotalPass").
+const platforms = ['Wellhub', 'TotalPass'];
+---
+
+<section class="benefit" id={SECTIONS.beneficio} aria-labelledby="benefit-title">
+  <div class="container">
+    <div class="benefit__panel card" data-reveal>
+      <div class="benefit__text">
+        <p class="benefit__eyebrow"><Icon name="ticket" size={18} /> Benefício corporativo</p>
+        <h2 id="benefit-title" class="benefit__title">
+          Seu benefício corporativo também pode levar você <em>à Apollo.</em>
+        </h2>
+        <p class="benefit__copy">
+          A Apollo Body &amp; Health aceita Wellhub e TotalPass. Consulte as condições de acesso, os planos elegíveis e
+          a disponibilidade das modalidades diretamente com nossa equipe.
+        </p>
+        <WhatsAppButton message={MESSAGES.benefit} origin="beneficio" category="benefit" item="Wellhub/TotalPass" size="lg">
+          Consultar acesso pelo meu benefício
+        </WhatsAppButton>
+      </div>
+      <ul class="benefit__logos" aria-label="Plataformas aceitas">
+        {
+          platforms.map((name) => (
+            <li class="platform">
+              <span class="platform__name">{name}</span>
+              <span class="platform__tag">Aceito na Apollo</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .benefit {
+    padding-block: clamp(2rem, 5vw, 4rem) var(--section-y);
+    background: var(--bg);
+  }
+  .benefit__panel {
+    display: grid;
+    gap: 2rem;
+    padding: clamp(1.75rem, 4vw, 3.5rem);
+    border-radius: 28px;
+    overflow: hidden;
+    background:
+      radial-gradient(60% 120% at 100% 50%, rgb(25 195 255 / 0.16), transparent 65%),
+      linear-gradient(180deg, rgb(255 255 255 / 0.04), rgb(255 255 255 / 0.01)), var(--surface);
+  }
+  .benefit__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-bottom: 1rem;
+    font-family: var(--font-display);
+    font-size: 0.76rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--cyan);
+  }
+  .benefit__title {
+    max-width: 30rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.7rem, 1.2rem + 2.2vw, 2.6rem);
+    line-height: 1.12;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+  .benefit__title em {
+    font-style: normal;
+    color: var(--cyan);
+  }
+  .benefit__copy {
+    max-width: 34rem;
+    margin: 1.1rem 0 1.75rem;
+    color: var(--muted);
+  }
+  .benefit__logos {
+    display: grid;
+    gap: 0.9rem;
+    align-content: center;
+  }
+  .platform {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 1.4rem 1.5rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 20px;
+    background: rgb(5 8 13 / 0.6);
+    backdrop-filter: blur(8px);
+  }
+  .platform__name {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 1.3rem + 1.2vw, 2.1rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .platform__tag {
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--cyan);
+  }
+  @media (min-width: 900px) {
+    .benefit__panel {
+      grid-template-columns: 1.2fr 0.8fr;
+      align-items: center;
+      gap: 3rem;
+    }
+  }
+</style>

@@ -1,0 +1,282 @@
+---
+import { getImage } from 'astro:assets';
+import Photo from './Photo.astro';
+import Icon from './Icon.astro';
+import SectionHeading from './SectionHeading.astro';
+import { GALLERY } from '@/data/gallery';
+import { resolveImage } from '@/lib/images';
+import { SECTIONS } from '@/config/site';
+
+// Para cada espaço: se houver foto real, gera também a versão ampliada (visualização em tela cheia).
+const items = await Promise.all(
+  GALLERY.map(async (item) => {
+    const resolved = resolveImage(item.folder, item.name);
+    let full: string | undefined;
+    if (resolved) {
+      const large = await getImage({
+        src: resolved.image,
+        width: Math.min(1800, resolved.image.width),
+        format: 'webp',
+        quality: 82,
+      });
+      full = large.src;
+    }
+    return { ...item, hasPhoto: Boolean(resolved), full };
+  }),
+);
+---
+
+<section class="section gallery" id={SECTIONS.estrutura} aria-labelledby="gallery-title">
+  <div class="container">
+    <SectionHeading
+      eyebrow="Conheça nosso espaço"
+      title="Um ambiente que convida você <em>a continuar.</em>"
+      id="gallery-title"
+    />
+
+    <ul class="gallery__grid">
+      {
+        items.map((item, i) => (
+          <li class="gallery__item" data-reveal style={`--reveal-delay:${(i % 4) * 60}ms`}>
+            {item.hasPhoto ? (
+              <button
+                type="button"
+                class="gallery__open"
+                data-lightbox
+                data-full={item.full}
+                data-alt={item.alt}
+                data-caption={item.caption ?? ''}
+                aria-label={`Ampliar foto: ${item.label}`}
+                aria-haspopup="dialog"
+              >
+                <Photo
+                  folder={item.folder}
+                  name={item.name}
+                  alt={item.alt}
+                  sizes="(min-width: 1040px) 280px, (min-width: 640px) 30vw, 46vw"
+                  widths={[360, 560, 800]}
+                />
+                <span class="gallery__caption">{item.label}</span>
+                <span class="gallery__zoom">
+                  <Icon name="plus" size={18} />
+                </span>
+              </button>
+            ) : (
+              <figure class="gallery__slot">
+                <Photo
+                  folder={item.folder}
+                  name={item.name}
+                  alt={item.alt}
+                  placeholderLabel="Foto real em breve"
+                />
+                <figcaption class="gallery__caption">{item.label}</figcaption>
+              </figure>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <dialog class="lightbox" data-lightbox-dialog aria-label="Visualização ampliada da foto">
+    <div class="lightbox__inner">
+      <button type="button" class="lightbox__btn lightbox__close" data-lightbox-close aria-label="Fechar visualização">
+        <Icon name="close" size={24} />
+      </button>
+      <button type="button" class="lightbox__btn lightbox__prev" data-lightbox-prev aria-label="Foto anterior">
+        <Icon name="chevron-left" size={26} />
+      </button>
+      <figure class="lightbox__figure">
+        <img class="lightbox__img" alt="" data-lightbox-img />
+        <figcaption class="lightbox__caption" data-lightbox-caption></figcaption>
+      </figure>
+      <button type="button" class="lightbox__btn lightbox__next" data-lightbox-next aria-label="Próxima foto">
+        <Icon name="chevron-right" size={26} />
+      </button>
+    </div>
+  </dialog>
+</section>
+
+<script>
+  const triggers = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-lightbox]'));
+  const dialog = document.querySelector<HTMLDialogElement>('[data-lightbox-dialog]');
+  const img = document.querySelector<HTMLImageElement>('[data-lightbox-img]');
+  const caption = document.querySelector<HTMLElement>('[data-lightbox-caption]');
+
+  if (dialog && img && caption && triggers.length) {
+    let index = 0;
+    let opener: HTMLElement | null = null;
+
+    const show = (i: number) => {
+      index = (i + triggers.length) % triggers.length;
+      const t = triggers[index];
+      img.src = t.dataset.full ?? '';
+      img.alt = t.dataset.alt ?? '';
+      caption.textContent = t.dataset.caption ?? '';
+      caption.hidden = !t.dataset.caption;
+    };
+
+    triggers.forEach((t, i) =>
+      t.addEventListener('click', () => {
+        opener = t;
+        show(i);
+        dialog.showModal();
+      }),
+    );
+
+    dialog.querySelector('[data-lightbox-close]')?.addEventListener('click', () => dialog.close());
+    dialog.querySelector('[data-lightbox-prev]')?.addEventListener('click', () => show(index - 1));
+    dialog.querySelector('[data-lightbox-next]')?.addEventListener('click', () => show(index + 1));
+
+    // Clique no fundo escuro fecha
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog || (e.target as Element).classList.contains('lightbox__inner')) dialog.close();
+    });
+    dialog.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') show(index - 1);
+      if (e.key === 'ArrowRight') show(index + 1);
+    });
+    dialog.addEventListener('close', () => {
+      img.removeAttribute('src');
+      opener?.focus();
+    });
+  }
+</script>
+
+<style>
+  .gallery {
+    background: var(--bg-soft);
+  }
+  .gallery__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  .gallery__item {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: var(--surface);
+  }
+  .gallery__open,
+  .gallery__slot {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    overflow: hidden;
+  }
+  .gallery__open {
+    cursor: zoom-in;
+  }
+  .gallery__open :global(.photo__img) {
+    transition: transform 0.6s var(--ease);
+  }
+  .gallery__open:hover :global(.photo__img) {
+    transform: scale(1.05);
+  }
+  .gallery__caption {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: 1.75rem 0.9rem 0.75rem;
+    text-align: left;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(180deg, transparent, rgb(5 8 13 / 0.88));
+    pointer-events: none;
+  }
+  .gallery__zoom {
+    position: absolute;
+    top: 0.65rem;
+    right: 0.65rem;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    color: #fff;
+    background: rgb(5 8 13 / 0.65);
+    border: 1px solid var(--line-strong);
+    backdrop-filter: blur(6px);
+  }
+
+  .lightbox {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: rgb(3 6 10 / 0.94);
+    color: #fff;
+  }
+  .lightbox::backdrop {
+    background: rgb(3 6 10 / 0.9);
+  }
+  .lightbox__inner {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.5rem;
+    height: 100%;
+    padding: 4rem 0.75rem 1.5rem;
+  }
+  .lightbox__figure {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+    margin: 0;
+  }
+  .lightbox__img {
+    max-width: 100%;
+    max-height: calc(100dvh - 9rem);
+    border-radius: 12px;
+    object-fit: contain;
+  }
+  .lightbox__caption {
+    font-size: 0.95rem;
+    color: var(--muted);
+    text-align: center;
+  }
+  .lightbox__btn {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid var(--line-strong);
+    background: rgb(255 255 255 / 0.08);
+    cursor: pointer;
+    transition: background-color 0.2s var(--ease);
+  }
+  .lightbox__btn:hover {
+    background: rgb(25 195 255 / 0.25);
+  }
+  .lightbox__close {
+    position: absolute;
+    top: 0.9rem;
+    right: 0.9rem;
+  }
+
+  @media (min-width: 640px) {
+    .gallery__grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+  }
+  @media (min-width: 1040px) {
+    .gallery__grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>

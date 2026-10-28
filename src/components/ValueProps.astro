@@ -1,0 +1,112 @@
+﻿---
+import Icon from './Icon.astro';
+import type { IconName } from './icon-names.ts';
+import SectionHeading from './SectionHeading.astro';
+import { SECTIONS } from '@/config/site';
+
+const pillars: { icon: IconName; title: string; text: string }[] = [
+  {
+    icon: 'layers',
+    title: 'Variedade de modalidades',
+    text: 'Diferentes possibilidades para movimentar o corpo, desenvolver habilidades e manter uma rotina ativa.',
+  },
+  {
+    icon: 'heart-pulse',
+    title: 'Orientação e cuidado',
+    text: 'Valorizamos a importância da orientação profissional e da execução adequada dos exercícios.',
+  },
+  {
+    icon: 'sparkles',
+    title: 'Uma experiência completa',
+    text: 'Musculação, aulas coletivas e artes marciais reunidas em um único espaço.',
+  },
+  {
+    icon: 'clock',
+    title: 'Treino que acompanha sua rotina',
+    text: 'Diferentes horários e modalidades para facilitar a construção de uma rotina consistente.',
+  },
+];
+---
+
+<section class="section values" id={SECTIONS.valores} aria-labelledby="values-title">
+  <div class="container">
+    <SectionHeading
+      eyebrow="Nossa proposta"
+      title="Mais do que treinar. Um espaço para <em>cuidar de você.</em>"
+      id="values-title"
+    />
+    <ul class="values__grid">
+      {
+        pillars.map((p, i) => (
+          <li class="values__card card" data-reveal style={`--reveal-delay:${i * 80}ms`}>
+            <span class="values__icon">
+              <Icon name={p.icon} size={26} />
+            </span>
+            <h3>{p.title}</h3>
+            <p>{p.text}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .values {
+    background:
+      radial-gradient(60% 40% at 50% 0%, rgb(25 195 255 / 0.07), transparent 70%), var(--bg);
+  }
+  .values__grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 1fr;
+  }
+  .values__card {
+    padding: clamp(1.5rem, 3vw, 2rem);
+    transition:
+      transform 0.35s var(--ease),
+      border-color 0.35s var(--ease),
+      box-shadow 0.35s var(--ease);
+  }
+  .values__card:hover {
+    border-color: rgb(25 195 255 / 0.4);
+    box-shadow: 0 24px 50px -30px rgb(25 195 255 / 0.5);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .values__card:hover {
+      transform: translateY(-4px);
+    }
+  }
+  .values__icon {
+    display: inline-grid;
+    place-items: center;
+    width: 54px;
+    height: 54px;
+    margin-bottom: 1.4rem;
+    border-radius: 16px;
+    color: var(--cyan);
+    background: linear-gradient(145deg, rgb(25 195 255 / 0.16), rgb(25 195 255 / 0.03));
+    border: 1px solid rgb(25 195 255 / 0.28);
+  }
+  .values__card h3 {
+    margin-bottom: 0.6rem;
+    font-family: var(--font-display);
+    font-size: 1.18rem;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+  .values__card p {
+    color: var(--muted);
+    font-size: 0.97rem;
+  }
+  @media (min-width: 640px) {
+    .values__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1040px) {
+    .values__grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>

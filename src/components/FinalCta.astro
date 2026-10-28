@@ -1,0 +1,92 @@
+---
+import Button from './Button.astro';
+import WhatsAppButton from './WhatsAppButton.astro';
+import { LOCATION, SECTIONS } from '@/config/site';
+import { MESSAGES } from '@/lib/messages';
+---
+
+<section class="final" aria-labelledby="final-title">
+  <div class="final__glow" aria-hidden="true"></div>
+  <div class="container final__inner" data-reveal>
+    <h2 id="final-title" class="final__title">Seu próximo passo <em>começa aqui.</em></h2>
+    <p class="final__text">
+      Encontre a modalidade que combina com você, conheça nosso espaço e converse com nossa equipe para descobrir a
+      melhor forma de começar.
+    </p>
+    <div class="final__actions">
+      <WhatsAppButton message={MESSAGES.general} origin="cta-final" category="general" size="lg">
+        Falar com a Apollo
+      </WhatsAppButton>
+      <Button
+        href={LOCATION.mapsUrl}
+        variant="secondary"
+        size="lg"
+        icon="pin"
+        track="maps"
+        origin="cta-final"
+        category="ver-localizacao"
+      >
+        Ver localização
+      </Button>
+      <Button href={`#${SECTIONS.planos}`} variant="secondary" size="lg" iconAfter="arrow-right">
+        Conhecer os planos
+      </Button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .final {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding-block: clamp(5rem, 11vw, 9rem);
+    text-align: center;
+    background: linear-gradient(180deg, var(--bg) 0%, #07111a 100%);
+    border-top: 1px solid var(--line);
+  }
+  .final__glow {
+    position: absolute;
+    z-index: -1;
+    left: 50%;
+    top: 50%;
+    width: min(1100px, 130%);
+    aspect-ratio: 2 / 1;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(closest-side, rgb(25 195 255 / 0.22), transparent);
+    pointer-events: none;
+  }
+  .final__title {
+    max-width: 18ch;
+    margin-inline: auto;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(2.3rem, 1.4rem + 4.4vw, 4.4rem);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+  .final__title em {
+    font-style: normal;
+    color: var(--cyan);
+  }
+  .final__text {
+    max-width: 40rem;
+    margin: 1.4rem auto 0;
+    color: var(--muted);
+    font-size: clamp(1rem, 0.95rem + 0.3vw, 1.15rem);
+  }
+  .final__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 2.25rem;
+  }
+  @media (min-width: 720px) {
+    .final__actions {
+      flex-direction: row;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  }
+</style>

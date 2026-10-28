@@ -1,0 +1,40 @@
+---
+import Button from './Button.astro';
+import { buildWhatsAppLink } from '@/lib/whatsapp';
+
+/**
+ * Botão de WhatsApp com mensagem pré-preenchida e rastreamento por origem.
+ *  - origin:   onde está o botão (header, hero, modalidades, planos, judo, footer...)
+ *  - category: tipo de intenção (general | modality | plan | judo | benefit | faq | location)
+ *  - item:     nome da modalidade/plano, quando houver
+ */
+interface Props {
+  message: string;
+  origin: string;
+  category: 'general' | 'modality' | 'plan' | 'judo' | 'benefit' | 'faq' | 'location';
+  item?: string;
+  variant?: 'primary' | 'secondary' | 'ghost' | 'dark';
+  size?: 'md' | 'lg';
+  block?: boolean;
+  noIcon?: boolean;
+  class?: string;
+}
+
+const { message, origin, category, item, variant, size, block, noIcon = false, class: className } = Astro.props;
+---
+
+<Button
+  href={buildWhatsAppLink(message)}
+  variant={variant}
+  size={size}
+  block={block}
+  icon={noIcon ? undefined : 'whatsapp'}
+  class={className}
+  external
+  track="whatsapp"
+  origin={origin}
+  category={category}
+  item={item}
+>
+  <slot />
+</Button>

@@ -1,0 +1,175 @@
+﻿---
+import Icon from './Icon.astro';
+import type { IconName } from './icon-names.ts';
+
+/**
+ * Botão/link reutilizável. Links externos recebem target="_blank" e rel seguro automaticamente.
+ * Os atributos data-* alimentam o rastreamento de eventos (src/scripts/tracking.ts).
+ */
+interface Props {
+  href: string;
+  variant?: 'primary' | 'secondary' | 'ghost' | 'dark';
+  size?: 'md' | 'lg';
+  icon?: IconName;
+  iconAfter?: IconName;
+  block?: boolean;
+  class?: string;
+  external?: boolean;
+  /** Tipo de evento: whatsapp | maps | none */
+  track?: 'whatsapp' | 'maps';
+  origin?: string;
+  category?: string;
+  item?: string;
+  ariaLabel?: string;
+}
+
+const {
+  href,
+  variant = 'primary',
+  size = 'md',
+  icon,
+  iconAfter,
+  block = false,
+  class: className,
+  external = /^https?:\/\//.test(href),
+  track,
+  origin,
+  category,
+  item,
+  ariaLabel,
+} = Astro.props;
+---
+
+<a
+  href={href}
+  class:list={['btn', `btn--${variant}`, `btn--${size}`, { 'btn--block': block }, className]}
+  target={external ? '_blank' : undefined}
+  rel={external ? 'noopener noreferrer' : undefined}
+  aria-label={ariaLabel}
+  data-track={track}
+  data-origin={track ? origin : undefined}
+  data-category={track ? category : undefined}
+  data-item={track && item ? item : undefined}
+>
+  {icon && <Icon name={icon} size={size === 'lg' ? 22 : 20} class="btn__icon" />}
+  <span class="btn__label"><slot /></span>
+  {iconAfter && <Icon name={iconAfter} size={18} class="btn__icon btn__icon--after" />}
+  {external && <span class="sr-only"> (abre em nova aba)</span>}
+</a>
+
+<style>
+  .btn {
+    --btn-bg: var(--cyan);
+    --btn-fg: #021018;
+    --btn-border: transparent;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    min-height: 48px;
+    padding: 0.75rem 1.4rem;
+    border-radius: 999px;
+    border: 1px solid var(--btn-border);
+    background: var(--btn-bg);
+    color: var(--btn-fg);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.95rem;
+    line-height: 1.2;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      transform 0.2s var(--ease),
+      background-color 0.2s var(--ease),
+      box-shadow 0.25s var(--ease),
+      border-color 0.2s var(--ease),
+      color 0.2s var(--ease);
+  }
+  .btn--lg {
+    min-height: 56px;
+    padding: 0.95rem 1.75rem;
+    font-size: 1.02rem;
+  }
+  .btn--block {
+    display: flex;
+    width: 100%;
+  }
+  .btn__icon {
+    flex: none;
+  }
+  .btn__icon--after {
+    transition: transform 0.2s var(--ease);
+  }
+  .btn:hover .btn__icon--after {
+    transform: translateX(3px);
+  }
+
+  .btn--primary {
+    background-image: linear-gradient(135deg, #3fd2ff, #12b4ee);
+    box-shadow:
+      0 8px 28px -10px rgb(25 195 255 / 0.65),
+      inset 0 1px 0 rgb(255 255 255 / 0.35);
+  }
+  .btn--primary:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 14px 34px -10px rgb(25 195 255 / 0.8),
+      inset 0 1px 0 rgb(255 255 255 / 0.45);
+  }
+  .btn--primary:active {
+    transform: translateY(0);
+  }
+
+  .btn--secondary {
+    --btn-bg: rgb(255 255 255 / 0.04);
+    --btn-fg: var(--text);
+    --btn-border: rgb(255 255 255 / 0.22);
+    backdrop-filter: blur(6px);
+  }
+  .btn--secondary:hover {
+    --btn-border: var(--cyan);
+    --btn-bg: rgb(25 195 255 / 0.1);
+    transform: translateY(-2px);
+  }
+
+  .btn--ghost {
+    --btn-bg: transparent;
+    --btn-fg: var(--cyan);
+    --btn-border: rgb(25 195 255 / 0.4);
+  }
+  .btn--ghost:hover {
+    --btn-bg: rgb(25 195 255 / 0.1);
+    transform: translateY(-2px);
+  }
+
+  .btn--dark {
+    --btn-bg: #03080d;
+    --btn-fg: #ffffff;
+    box-shadow: 0 12px 30px -12px rgb(0 0 0 / 0.7);
+  }
+  .btn--dark :global(.btn__icon) {
+    color: var(--cyan);
+  }
+  .btn--dark:hover {
+    transform: translateY(-2px);
+    --btn-bg: #000;
+  }
+
+  .btn:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 3px;
+    box-shadow: 0 0 0 6px rgb(25 195 255 / 0.55);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn,
+    .btn__icon--after {
+      transition: none;
+    }
+    .btn:hover {
+      transform: none;
+    }
+  }
+</style>

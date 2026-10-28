@@ -1,0 +1,126 @@
+---
+import { Picture } from 'astro:assets';
+import { resolveImage, type ImageFolder } from '@/lib/images';
+import Icon from './Icon.astro';
+
+/**
+ * Foto com troca automática: usa a foto real (pasta/nome) quando existir; senão a imagem provisória;
+ * senão um placeholder elegante. Gera AVIF/WebP, srcset, width/height (sem layout shift) e lazy loading.
+ */
+interface Props {
+  folder: ImageFolder;
+  name: string;
+  /** Nome (sem extensão) de uma imagem em src/assets/images/provisorias/ usada enquanto não houver foto real. */
+  fallback?: string;
+  alt: string;
+  /** Texto do placeholder quando não há nenhuma imagem. */
+  placeholderLabel?: string;
+  sizes?: string;
+  widths?: number[];
+  /** true para imagens acima da dobra (LCP): eager + fetchpriority high. */
+  priority?: boolean;
+  class?: string;
+  /** Posição do foco do recorte (CSS object-position). */
+  position?: string;
+  /** Mostrar o selo "Imagem ilustrativa" quando for provisória. */
+  badge?: boolean;
+}
+
+const {
+  folder,
+  name,
+  fallback,
+  alt,
+  placeholderLabel = 'Foto real em breve',
+  sizes = '100vw',
+  widths = [480, 768, 1080, 1440, 1920],
+  priority = false,
+  class: className,
+  position = 'center',
+  badge = true,
+} = Astro.props;
+
+const resolved = resolveImage(folder, name, fallback);
+---
+
+<div class:list={['photo', className]} data-provisional={resolved?.provisional ? 'true' : undefined}>
+  {
+    resolved ? (
+      <>
+        <Picture
+          src={resolved.image}
+          alt={alt}
+          formats={['avif', 'webp']}
+          widths={widths.filter((w) => w <= resolved.image.width)}
+          sizes={sizes}
+          loading={priority ? 'eager' : 'lazy'}
+          decoding={priority ? 'sync' : 'async'}
+          fetchpriority={priority ? 'high' : 'auto'}
+          class="photo__img"
+          style={`object-position:${position}`}
+          pictureAttributes={{ class: 'photo__picture' }}
+        />
+        {resolved.provisional && badge && <span class="photo__badge">Imagem ilustrativa</span>}
+      </>
+    ) : (
+      <div class="photo__placeholder" role="img" aria-label={`Espaço reservado: ${alt}`}>
+        <Icon name="camera" size={28} />
+        <span>{placeholderLabel}</span>
+      </div>
+    )
+  }
+</div>
+
+<style>
+  .photo {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--surface-2);
+  }
+  .photo :global(.photo__picture),
+  .photo :global(.photo__img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .photo :global(.photo__img) {
+    object-fit: cover;
+  }
+  .photo__badge {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.82);
+    background: rgb(5 8 13 / 0.62);
+    border: 1px solid rgb(255 255 255 / 0.14);
+    backdrop-filter: blur(6px);
+    pointer-events: none;
+  }
+  .photo__placeholder {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 0.6rem;
+    color: var(--muted);
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background:
+      radial-gradient(60% 70% at 50% 0%, rgb(25 195 255 / 0.16), transparent 70%),
+      repeating-linear-gradient(135deg, rgb(255 255 255 / 0.025) 0 14px, transparent 14px 28px),
+      linear-gradient(160deg, #121a24, #0a0f16);
+  }
+  .photo__placeholder :global(svg) {
+    color: var(--cyan);
+    opacity: 0.85;
+  }
+</style>

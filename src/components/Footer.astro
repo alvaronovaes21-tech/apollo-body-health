@@ -1,0 +1,207 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { NAV_ITEMS } from '@/data/navigation';
+import { buildWhatsAppLink } from '@/lib/whatsapp';
+import { MESSAGES } from '@/lib/messages';
+import { CONTACT, LOCATION, SECTIONS, SITE, SOCIAL } from '@/config/site';
+
+const year = new Date().getFullYear();
+const quickLinks = [...NAV_ITEMS, { label: 'Perguntas frequentes', href: `#${SECTIONS.faq}` }];
+const hasLegal = Boolean(SOCIAL.privacyUrl || SOCIAL.cookiesUrl);
+---
+
+<footer class="footer">
+  <div class="container footer__grid">
+    <div class="footer__brand">
+      <Logo height={44} />
+      <p class="footer__name">{SITE.name}</p>
+      <p class="footer__text">
+        Musculação, aulas coletivas e artes marciais em {SITE.city}, Bahia.
+      </p>
+      <p class="footer__benefit">
+        <Icon name="ticket" size={18} />
+        <span>Aceitamos Wellhub e TotalPass</span>
+      </p>
+    </div>
+
+    <nav class="footer__col" aria-label="Links do rodapé">
+      <h2 class="footer__title">Navegação</h2>
+      <ul>
+        {
+          quickLinks.map((l) => (
+            <li>
+              <a href={l.href}>{l.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="footer__col">
+      <h2 class="footer__title">Contato</h2>
+      <ul>
+        <li>
+          <a
+            href={buildWhatsAppLink(MESSAGES.general)}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-track="whatsapp"
+            data-origin="footer"
+            data-category="general"
+          >
+            <Icon name="whatsapp" size={18} /> WhatsApp {CONTACT.phoneDisplay}
+            <span class="sr-only">(abre em nova aba)</span>
+          </a>
+        </li>
+        <li>
+          <a
+            href={LOCATION.mapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-track="maps"
+            data-origin="footer"
+            data-category="ver-localizacao"
+          >
+            <Icon name="pin" size={18} /> Ver no Google Maps
+            <span class="sr-only">(abre em nova aba)</span>
+          </a>
+        </li>
+        <li>
+          {
+            SOCIAL.instagramUrl ? (
+              <a href={SOCIAL.instagramUrl} target="_blank" rel="noopener noreferrer">
+                <Icon name="arrow-up-right" size={18} /> Instagram
+                <span class="sr-only">(abre em nova aba)</span>
+              </a>
+            ) : (
+              <span class="footer__muted">Instagram oficial em breve</span>
+            )
+          }
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container footer__bottom">
+    <p>© {year} {SITE.name}. Todos os direitos reservados.</p>
+    {
+      hasLegal && (
+        <ul class="footer__legal">
+          {SOCIAL.privacyUrl && (
+            <li>
+              <a href={SOCIAL.privacyUrl}>Política de privacidade</a>
+            </li>
+          )}
+          {SOCIAL.cookiesUrl && (
+            <li>
+              <a href={SOCIAL.cookiesUrl}>Aviso de cookies</a>
+            </li>
+          )}
+        </ul>
+      )
+    }
+  </div>
+</footer>
+
+<style>
+  .footer {
+    padding-top: clamp(3.5rem, 7vw, 5rem);
+    padding-bottom: 6.5rem;
+    background: #03060a;
+    border-top: 1px solid var(--line);
+  }
+  .footer__grid {
+    display: grid;
+    gap: 2.5rem;
+  }
+  .footer__name {
+    margin-top: 1rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+  .footer__text {
+    max-width: 22rem;
+    margin-top: 0.4rem;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+  .footer__benefit {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-top: 1.25rem;
+    padding: 0.5rem 0.95rem;
+    border: 1px solid rgb(25 195 255 / 0.3);
+    border-radius: 999px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    background: rgb(25 195 255 / 0.07);
+  }
+  .footer__benefit :global(svg) {
+    color: var(--cyan);
+  }
+  .footer__title {
+    margin-bottom: 1rem;
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--cyan);
+  }
+  .footer__col ul {
+    display: grid;
+    gap: 0.15rem;
+  }
+  .footer__col a,
+  .footer__muted {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 44px;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s var(--ease);
+  }
+  .footer__col a:hover {
+    color: var(--text);
+  }
+  .footer__muted {
+    font-size: 0.95rem;
+    font-style: italic;
+  }
+  .footer__bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .footer__legal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.25rem;
+  }
+  .footer__legal a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--muted);
+  }
+  @media (min-width: 760px) {
+    .footer__grid {
+      grid-template-columns: 1.4fr 1fr 1fr;
+      gap: 3rem;
+    }
+    .footer__bottom {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
+</style>

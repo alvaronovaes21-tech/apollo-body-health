@@ -1,0 +1,188 @@
+﻿---
+import Photo from './Photo.astro';
+import Icon from './Icon.astro';
+import type { IconName } from './icon-names.ts';
+import SectionHeading from './SectionHeading.astro';
+import ScheduleList from './ScheduleList.astro';
+import WhatsAppButton from './WhatsAppButton.astro';
+import { MODALITIES } from '@/data/modalities';
+import { SECTIONS } from '@/config/site';
+
+const icons: Record<string, IconName> = {
+  musculacao: 'dumbbell',
+  ritmos: 'music',
+  boxe: 'glove',
+  'jiu-jitsu-adulto': 'belt',
+  'jiu-jitsu-no-gi': 'belt',
+  'jiu-kids': 'baby',
+};
+---
+
+<section class="section modalities" id={SECTIONS.modalidades} aria-labelledby="modalities-title">
+  <div class="container">
+    <SectionHeading
+      eyebrow="Modalidades"
+      title="Encontre a modalidade que <em>combina com você.</em>"
+      subtitle="Musculação, aulas coletivas e artes marciais em um só lugar."
+      id="modalities-title"
+    />
+
+    <ul class="modalities__grid">
+      {
+        MODALITIES.map((m, i) => (
+          <li class="mod card" id={`modalidade-${m.id}`} data-reveal style={`--reveal-delay:${(i % 3) * 80}ms`}>
+            <div class="mod__photo">
+              <!-- Foto real: src/assets/images/modalidades/<imageKey>.jpg -->
+              <Photo
+                folder="modalidades"
+                name={m.imageKey}
+                alt={m.imageAlt}
+                placeholderLabel={`Foto de ${m.name}`}
+                sizes="(min-width: 1040px) 380px, (min-width: 640px) 46vw, 92vw"
+                widths={[480, 768, 1080]}
+              />
+              <span class="mod__icon">
+                <Icon name={icons[m.id] ?? 'dumbbell'} size={22} />
+              </span>
+            </div>
+            <div class="mod__body">
+              <p class="mod__category">{m.categoryLabel}</p>
+              <h3 class="mod__name">
+                {m.name}
+                {m.note && <span class="mod__note">{m.note}</span>}
+              </h3>
+              {m.description && <p class="mod__desc">{m.description}</p>}
+              <div class="mod__schedule">
+                <p class="mod__schedule-title">Dias e horários</p>
+                <ScheduleList items={m.schedule} />
+              </div>
+              <WhatsAppButton
+                message={m.whatsappMessage}
+                origin="modalidades"
+                category="modality"
+                item={m.name}
+                variant="secondary"
+                block
+              >
+                Consultar esta modalidade
+              </WhatsAppButton>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .modalities {
+    background: linear-gradient(180deg, var(--bg) 0%, var(--bg-soft) 100%);
+  }
+  .modalities__grid {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: 1fr;
+  }
+  .mod {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition:
+      transform 0.35s var(--ease),
+      border-color 0.35s var(--ease),
+      box-shadow 0.35s var(--ease);
+  }
+  .mod:hover {
+    border-color: rgb(25 195 255 / 0.4);
+    box-shadow: 0 28px 56px -34px rgb(25 195 255 / 0.55);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .mod:hover {
+      transform: translateY(-4px);
+    }
+  }
+  .mod__photo {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    border-bottom: 1px solid var(--line);
+  }
+  .mod__icon {
+    position: absolute;
+    left: 1rem;
+    top: 1rem;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    color: var(--cyan);
+    background: rgb(5 8 13 / 0.72);
+    border: 1px solid rgb(25 195 255 / 0.35);
+    backdrop-filter: blur(8px);
+  }
+  .mod__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.9rem;
+    padding: 1.5rem;
+  }
+  .mod__category {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--cyan);
+  }
+  .mod__name {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.3rem 0.7rem;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+  .mod__note {
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    color: var(--muted);
+    border: 1px solid var(--line-strong);
+  }
+  .mod__desc {
+    color: var(--muted);
+    font-size: 0.96rem;
+  }
+  .mod__schedule {
+    margin-top: auto;
+    padding-top: 0.25rem;
+  }
+  .mod__schedule-title {
+    margin-bottom: 0.55rem;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text);
+    opacity: 0.7;
+  }
+  .mod :global(.btn) {
+    margin-top: 0.4rem;
+  }
+
+  @media (min-width: 680px) {
+    .modalities__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1040px) {
+    .modalities__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>
