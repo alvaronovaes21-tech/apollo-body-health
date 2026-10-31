@@ -4,7 +4,7 @@ import SectionHeading from './SectionHeading.astro';
 import WhatsAppButton from './WhatsAppButton.astro';
 import { PLANS, PLANS_NOTE, PLAN_EXCLUSION_NOTE, JIU_JITSU_PLANS, JIU_JITSU_SECTION } from '@/data/plans';
 import { MESSAGES } from '@/lib/messages';
-import { SECTIONS } from '@/config/site';
+import { BLACK_FRIDAY, SECTIONS } from '@/config/site';
 ---
 
 <section class="section plans" id={SECTIONS.planos} aria-labelledby="plans-title">
@@ -18,9 +18,11 @@ import { SECTIONS } from '@/config/site';
 
     <ul class="plans__grid">
       {
-        PLANS.map((plan, i) => (
+        PLANS.map((plan, i) => {
+          const promo = BLACK_FRIDAY.enabled && plan.id === BLACK_FRIDAY.planId;
+          return (
           <li
-            class:list={['plan', { 'plan--featured': plan.featured }]}
+            class:list={['plan', { 'plan--featured': plan.featured, 'plan--promo': promo }]}
             data-reveal
             style={`--reveal-delay:${i * 90}ms`}
           >
@@ -30,6 +32,20 @@ import { SECTIONS } from '@/config/site';
                 {plan.name}
               </h3>
               <p class="plan__tagline">{plan.tagline}</p>
+
+              {promo && (
+                <div class="plan__promo">
+                  <p class="plan__promo-kicker">{BLACK_FRIDAY.eyebrow}</p>
+                  <p class="plan__promo-title">{BLACK_FRIDAY.headline}</p>
+                  <p class="plan__promo-seal">{BLACK_FRIDAY.seal}</p>
+                  <p class="plan__promo-text">{BLACK_FRIDAY.text}</p>
+                  <p class="plan__promo-price">
+                    <strong>{BLACK_FRIDAY.installment}</strong>
+                    <span>{BLACK_FRIDAY.total}</span>
+                  </p>
+                  <p class="plan__promo-deadline">{BLACK_FRIDAY.deadline}</p>
+                </div>
+              )}
 
               <div class="plan__pricing">
                 <div class="plan__price">
@@ -60,18 +76,19 @@ import { SECTIONS } from '@/config/site';
               </p>
 
               <WhatsAppButton
-                message={MESSAGES.plan(plan.whatsappName)}
-                origin="planos"
+                message={promo ? BLACK_FRIDAY.message : MESSAGES.plan(plan.whatsappName)}
+                origin={promo ? 'black-friday' : 'planos'}
                 category="plan"
                 item={plan.name}
                 variant={plan.featured ? 'primary' : 'secondary'}
                 block
               >
-                {plan.cta}
+                {promo ? BLACK_FRIDAY.cta : plan.cta}
               </WhatsAppButton>
             </article>
           </li>
-        ))
+          );
+        })
       }
     </ul>
 
@@ -219,6 +236,63 @@ import { SECTIONS } from '@/config/site';
     font-size: 0.92rem;
     color: var(--cyan);
     font-weight: 600;
+  }
+  .plan__promo {
+    display: grid;
+    gap: 0.55rem;
+    margin-top: 1.15rem;
+    padding: 0.95rem 1rem 1rem;
+    border: 1px solid rgb(25 195 255 / 0.4);
+    border-radius: 16px;
+    background: rgb(5 8 13 / 0.38);
+  }
+  .plan__promo-kicker {
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--cyan);
+  }
+  .plan__promo-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.02rem;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .plan__promo-seal {
+    justify-self: start;
+    padding: 0.28rem 0.7rem;
+    border-radius: 999px;
+    background: var(--cyan);
+    color: #021018;
+    font-family: var(--font-display);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+  .plan__promo-text {
+    color: rgb(243 246 250 / 0.9);
+    font-size: 0.92rem;
+    line-height: 1.45;
+  }
+  .plan__promo-price {
+    display: grid;
+    gap: 0.1rem;
+  }
+  .plan__promo-price strong {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--cyan);
+  }
+  .plan__promo-price span,
+  .plan__promo-deadline {
+    color: var(--muted);
+    font-size: 0.88rem;
+    line-height: 1.4;
   }
   .plan__features {
     display: grid;

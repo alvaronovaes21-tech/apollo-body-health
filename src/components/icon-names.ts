@@ -27,5 +27,6 @@
   | 'calendar'
   | 'lock'
   | 'gift'
-  | 'shield';
+  | 'shield'
+  | 'star';
 

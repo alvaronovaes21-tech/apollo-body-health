@@ -1,4 +1,5 @@
-﻿import { JUDO } from './judo.ts';
+﻿import { BLACK_FRIDAY } from '../config/site.ts';
+import { JUDO } from './judo.ts';
 
 /**
  * PERGUNTAS FREQUENTES
@@ -11,7 +12,7 @@ export interface FaqItem {
   cta?: boolean;
 }
 
-export const FAQ: FaqItem[] = [
+const FAQ_BASE: FaqItem[] = [
   {
     question: 'Quais modalidades a Apollo oferece?',
     answer: [
@@ -26,7 +27,7 @@ export const FAQ: FaqItem[] = [
     question: 'Como funcionam os planos mensal, semestral e anual?',
     answer: [
       'Temos três opções: Ouro Mensal (R$ 149,00 por mês, com taxa de matrícula de R$ 39,00), Ouro+ Semestral (R$ 720,00 em até 6 vezes no cartão, referência mensal de R$ 120,00) e Club+ Apollo (R$ 1.176,00 em até 12 vezes no cartão, referência mensal de R$ 98,00).',
-      'Todas as modalidades estão incluídas nesses planos, exceto Jiu-Jitsu, que tem mensalidade independente. Os benefícios de cada plano estão detalhados na seção Planos. Para condições de pagamento, regras de utilização e elegibilidade das modalidades, fale com a nossa equipe.',
+      'Todas as modalidades estão incluídas nesses planos, exceto Jiu-Jitsu e Judô. Jiu-Jitsu e Judô possuem mensalidades independentes. Os benefícios de cada plano estão detalhados na seção Planos. Para condições de pagamento, regras de utilização e elegibilidade das modalidades, fale com a nossa equipe.',
     ],
     cta: true,
   },
@@ -59,8 +60,14 @@ export const FAQ: FaqItem[] = [
     cta: true,
   },
   {
+    question: 'O Judô está incluído nos planos tradicionais?',
+    answer: ['Não. O Judô possui contratação independente, com mensalidade de R$ 166,00.'],
+  },
+  {
     question: 'Qual é o valor mensal do Judô?',
-    answer: [`A mensalidade do Judô para crianças e adolescentes é de ${JUDO.price}.`],
+    answer: [
+      `A mensalidade do Judô para crianças e adolescentes é de ${JUDO.price} por mês. A contratação é independente dos planos tradicionais da academia.`,
+    ],
   },
   {
     question: 'Como posso obter informações sobre matrícula?',
@@ -76,4 +83,18 @@ export const FAQ: FaqItem[] = [
     ],
     cta: true,
   },
+];
+
+const promoFaq: FaqItem[] = BLACK_FRIDAY.enabled
+  ? BLACK_FRIDAY.faq.map((item) => ({ question: item.question, answer: [item.answer] }))
+  : [];
+
+const plansIndex = FAQ_BASE.findIndex((item) => item.question.startsWith('Como funcionam os planos'));
+const promoAt = plansIndex === -1 ? FAQ_BASE.length : plansIndex + 1;
+
+/** Perguntas permanentes, com a Black Friday inserida só enquanto a campanha estiver ligada. */
+export const FAQ: FaqItem[] = [
+  ...FAQ_BASE.slice(0, promoAt),
+  ...promoFaq,
+  ...FAQ_BASE.slice(promoAt),
 ];

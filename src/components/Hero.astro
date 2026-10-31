@@ -1,7 +1,6 @@
 ---
 import Photo from './Photo.astro';
 import Icon from './Icon.astro';
-import Button from './Button.astro';
 import WhatsAppButton from './WhatsAppButton.astro';
 import { MESSAGES } from '@/lib/messages';
 import { SECTIONS, SITE } from '@/config/site';
@@ -36,25 +35,18 @@ const heroIsProvisional = resolveImage('hero', 'hero', 'hero-treino')?.provision
       </p>
 
       <h1 id="hero-title" class="hero__title">
-        Seu treino merece mais. <span>Sua experiência também.</span>
+        Atenção e cuidado de verdade, <span>pelo preço de uma academia de rede.</span>
       </h1>
 
       <p class="hero__lead">
-        Na Apollo Body &amp; Health, você encontra diferentes modalidades, profissionais preparados e um ambiente
-        pensado para transformar a sua relação com o movimento, a saúde e o bem-estar.
-      </p>
-      <p class="hero__sub">
-        Musculação, aulas coletivas e artes marciais em um só lugar, com opções para diferentes objetivos, rotinas e
-        fases da vida.
+        Treine em um ambiente acolhedor, com professores que sabem o seu nome e te acompanham de perto. Sem filas, sem
+        lotação e sem complicação.
       </p>
 
       <div class="hero__actions">
-        <WhatsAppButton message={MESSAGES.general} origin="hero" category="general" size="lg">
-          Quero conhecer a academia
+        <WhatsAppButton message={MESSAGES.heroPlans} origin="hero" category="general" size="lg">
+          VER PLANOS E GARANTIR VAGA
         </WhatsAppButton>
-        <Button href={`#${SECTIONS.modalidades}`} variant="secondary" size="lg" iconAfter="arrow-right">
-          Conheça nossas modalidades
-        </Button>
       </div>
 
       <p class="hero__benefit">
@@ -91,7 +83,7 @@ const heroIsProvisional = resolveImage('hero', 'hero', 'hero-treino')?.provision
     z-index: -2;
     background:
       linear-gradient(180deg, rgb(5 8 13 / 0.78) 0%, rgb(5 8 13 / 0.35) 32%, rgb(5 8 13 / 0.9) 82%, var(--bg) 100%),
-      linear-gradient(90deg, rgb(5 8 13 / 0.92) 0%, rgb(5 8 13 / 0.55) 55%, rgb(5 8 13 / 0.15) 100%);
+      linear-gradient(90deg, rgb(5 8 13 / 0.94) 0%, rgb(5 8 13 / 0.72) 46%, rgb(5 8 13 / 0.22) 100%);
   }
   .hero__glow {
     position: absolute;
@@ -105,7 +97,7 @@ const heroIsProvisional = resolveImage('hero', 'hero', 'hero-treino')?.provision
     width: min(100% - 2.5rem, var(--container));
   }
   .hero__content {
-    max-width: 44rem;
+    max-width: 40rem;
   }
   .hero__place {
     display: inline-flex;
@@ -127,7 +119,7 @@ const heroIsProvisional = resolveImage('hero', 'hero', 'hero-treino')?.provision
   .hero__title {
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: clamp(2.35rem, 1.3rem + 5.6vw, 4.9rem);
+    font-size: clamp(1.85rem, 0.85rem + 3.5vw, 3.55rem);
     line-height: 1.04;
     letter-spacing: -0.035em;
     text-wrap: balance;
@@ -137,21 +129,25 @@ const heroIsProvisional = resolveImage('hero', 'hero', 'hero-treino')?.provision
     color: var(--cyan);
   }
   .hero__lead {
-    margin-top: 1.4rem;
+    margin-top: 1.25rem;
     max-width: 38rem;
-    font-size: clamp(1.02rem, 0.95rem + 0.4vw, 1.2rem);
+    font-size: clamp(1.02rem, 0.95rem + 0.35vw, 1.18rem);
     color: rgb(243 246 250 / 0.92);
-  }
-  .hero__sub {
-    margin-top: 0.9rem;
-    max-width: 36rem;
-    color: var(--muted);
+    text-wrap: pretty;
   }
   .hero__actions {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    margin-top: 2rem;
+    margin-top: 1.75rem;
+  }
+  .hero__actions :global(.btn) {
+    max-width: 100%;
+    height: auto;
+    text-align: center;
+  }
+  .hero__actions :global(.btn__label) {
+    text-wrap: balance;
   }
   .hero__benefit {
     display: inline-flex;
@@ -183,37 +179,32 @@ const heroIsProvisional = resolveImage('hero', 'hero', 'hero-treino')?.provision
     color: rgb(255 255 255 / 0.45);
   }
 
-  @media (min-width: 640px) {
-    .hero__actions {
-      flex-direction: row;
-      flex-wrap: wrap;
-    }
-  }
   @media (max-width: 639px) {
-    /* No celular, o CTA principal sobe para a primeira tela e o texto complementar vem logo abaixo. */
-    .hero__content {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-    }
-    .hero__actions {
-      order: 4;
+    .hero__actions :global(.btn) {
       width: 100%;
-      margin-top: 1.5rem;
-    }
-    .hero__sub {
-      order: 5;
-      font-size: 0.92rem;
-    }
-    .hero__benefit {
-      order: 6;
-      margin-top: 1.1rem;
     }
     .hero__lead {
       font-size: 1rem;
     }
+    .hero__benefit {
+      margin-top: 1.1rem;
+    }
     .hero__caption {
       display: none;
+    }
+  }
+  @media (max-height: 740px) {
+    .hero {
+      align-items: center;
+      padding-bottom: 2.25rem;
+    }
+    .hero__title {
+      font-size: clamp(1.7rem, 4.2vw, 2.5rem);
+    }
+    .hero__lead,
+    .hero__actions,
+    .hero__benefit {
+      margin-top: 0.9rem;
     }
   }
 </style>

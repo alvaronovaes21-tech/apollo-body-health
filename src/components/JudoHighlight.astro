@@ -46,10 +46,13 @@ import { SECTIONS } from '@/config/site';
         }
         <div class="fact fact--price">
           <dt>Mensalidade</dt>
-          <dd>{JUDO.price}</dd>
+          <dd>
+            {JUDO.price} <span class="fact__period">{JUDO.pricePeriod}</span>
+          </dd>
         </div>
       </dl>
 
+      <p class="judo__independent">{JUDO.independent}</p>
       <p class="judo__highlight">{JUDO.highlight}</p>
 
       <div class="judo__cta">
@@ -181,8 +184,10 @@ import { SECTIONS } from '@/config/site';
   .fact--price {
     grid-column: 1 / -1;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
+    gap: 0.35rem 1rem;
     background: #fff;
     color: #031018;
   }
@@ -195,6 +200,17 @@ import { SECTIONS } from '@/config/site';
     font-weight: 800;
     font-size: clamp(1.6rem, 1.3rem + 1.2vw, 2.1rem);
     letter-spacing: -0.02em;
+  }
+  .fact__period {
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+  .judo__independent {
+    margin-top: 1.15rem;
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1.4;
   }
   .judo__highlight {
     margin-top: 1.5rem;

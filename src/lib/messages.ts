@@ -2,6 +2,9 @@
 export const MESSAGES = {
   general:
     'Olá! Conheci a Apollo Body & Health pelo site e gostaria de receber informações sobre a academia e como realizar uma visita.',
+  /** Topo da página e chamadas discretas da jornada até os planos. */
+  heroPlans:
+    'Olá! Conheci a Apollo pelo site e gostaria de conhecer os planos e saber como garantir minha vaga.',
   musculacao:
     'Olá! Tenho interesse em conhecer a musculação da Apollo Body & Health. Poderiam me informar como funciona a matrícula?',
   plans:

@@ -1,0 +1,31 @@
+---
+import WhatsAppButton from './WhatsAppButton.astro';
+import { MESSAGES } from '@/lib/messages';
+
+interface Props {
+  origin: string;
+  lead: string;
+}
+
+const { origin, lead } = Astro.props;
+---
+
+<p class="quiet" data-reveal>
+  <span>{lead}</span>
+  <WhatsAppButton message={MESSAGES.heroPlans} origin={origin} category="general" variant="ghost">
+    Falar no WhatsApp
+  </WhatsAppButton>
+</p>
+
+<style>
+  .quiet {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem 1rem;
+    margin-top: clamp(1.75rem, 4vw, 2.5rem);
+    color: var(--muted);
+    text-align: center;
+  }
+</style>

@@ -19,6 +19,10 @@ export const JUDO = {
   ],
   price: 'R$ 166,00',
   priceSuffix: 'mensalidade',
+  /** Exibido ao lado do valor. A contratação não entra nos planos tradicionais. */
+  pricePeriod: 'por mês',
+  independent:
+    'O Judô não está incluído nos planos tradicionais. A contratação é independente.',
   highlight: 'Estamos formando duas turmas. Entre em contato e consulte as vagas!',
   cta: 'Quero informações sobre o Judô',
   whatsappMessage: MESSAGES.judo,

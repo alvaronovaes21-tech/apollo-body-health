@@ -76,8 +76,9 @@ export const PLANS: Plan[] = [
   },
 ];
 
-/** Observação exibida em cada um dos planos tradicionais. */
-export const PLAN_EXCLUSION_NOTE = 'Todas as modalidades incluídas, exceto Jiu-Jitsu.';
+/** Observação permanente, exibida em cada plano tradicional. Judô e Jiu-Jitsu ficam de fora. */
+export const PLAN_EXCLUSION_NOTE =
+  'Todas as modalidades incluídas, exceto Jiu-Jitsu e Judô. Jiu-Jitsu e Judô possuem mensalidades independentes.';
 
 /**
  * JIU-JITSU APOLLO — mensalidades independentes, fora dos planos tradicionais.

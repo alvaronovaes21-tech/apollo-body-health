@@ -7,7 +7,7 @@ import { MODALITIES } from '../src/data/modalities.ts';
 import { PLANS, PLAN_EXCLUSION_NOTE, JIU_JITSU_PLANS } from '../src/data/plans.ts';
 import { JUDO } from '../src/data/judo.ts';
 import { FAQ } from '../src/data/faq.ts';
-import { CONTACT, LOCATION, ANALYTICS, YOUTUBE_VIDEO_ID } from '../src/config/site.ts';
+import { BLACK_FRIDAY, CONTACT, LOCATION, ANALYTICS, YOUTUBE_VIDEO_ID } from '../src/config/site.ts';
 
 test('WhatsApp: número internacional e codificação da mensagem', () => {
   assert.equal(CONTACT.whatsappNumber, '5571999076612');
@@ -16,6 +16,18 @@ test('WhatsApp: número internacional e codificação da mensagem', () => {
   assert.equal(url.searchParams.get('text'), 'Olá! Quero saber mais & conhecer.');
   assert.equal(buildWhatsAppLink(), 'https://wa.me/5571999076612');
   assert.equal(buildWhatsAppLink('  '), 'https://wa.me/5571999076612');
+});
+
+test('WhatsApp: mensagem do topo pede planos e vaga sem alterar as demais', () => {
+  assert.equal(
+    MESSAGES.heroPlans,
+    'Olá! Conheci a Apollo pelo site e gostaria de conhecer os planos e saber como garantir minha vaga.',
+  );
+  assert.equal(new URL(buildWhatsAppLink(MESSAGES.heroPlans)).searchParams.get('text'), MESSAGES.heroPlans);
+  assert.equal(
+    MESSAGES.general,
+    'Olá! Conheci a Apollo Body & Health pelo site e gostaria de receber informações sobre a academia e como realizar uma visita.',
+  );
 });
 
 test('WhatsApp: mensagem do Judô é exatamente a definida', () => {
@@ -52,6 +64,11 @@ test('Judô: turmas, dias e mensalidade; faixa etária não inventada', () => {
     ['Das 08h às 09h', 'Das 16h às 17h'],
   );
   assert.equal(JUDO.ageRange, '');
+  assert.equal(JUDO.pricePeriod, 'por mês');
+  assert.equal(
+    JUDO.independent,
+    'O Judô não está incluído nos planos tradicionais. A contratação é independente.',
+  );
 });
 
 test('Planos: valores e benefícios conforme a arte oficial', () => {
@@ -109,14 +126,63 @@ test('Eventos: um único evento primário por clique, sem duplicar', () => {
   for (const name of Object.values(EVENTS)) assert.ok(!/enrol|matricula|purchase/i.test(name));
 });
 
-test('FAQ: 10 perguntas e valor do Judô coerente', () => {
-  assert.equal(FAQ.length, 10);
+test('FAQ: Judô independente e Black Friday só enquanto a campanha estiver ligada', () => {
+  const judoIncluded = FAQ.find((f) => f.question === 'O Judô está incluído nos planos tradicionais?');
+  assert.equal(
+    judoIncluded?.answer[0],
+    'Não. O Judô possui contratação independente, com mensalidade de R$ 166,00.',
+  );
   const judoPrice = FAQ.find((f) => f.question.includes('valor mensal do Judô'));
   assert.ok(judoPrice?.answer[0].includes('R$ 166,00'));
+  assert.ok(judoPrice?.answer[0].includes('independente'));
+  const plansAnswer = FAQ.find((f) => f.question.startsWith('Como funcionam os planos'))?.answer.join(' ');
+  assert.ok(plansAnswer?.includes('exceto Jiu-Jitsu e Judô'));
+  assert.ok(plansAnswer?.includes('mensalidades independentes'));
+
+  const promoQuestions = FAQ.filter((f) => /Black Friday|promoção/i.test(f.question));
+  if (BLACK_FRIDAY.enabled) {
+    assert.equal(FAQ.length, 13);
+    assert.equal(promoQuestions.length, 2);
+    assert.equal(
+      promoQuestions[0]?.answer[0],
+      'Durante novembro de 2026, contratando o plano anual Club+ Apollo por R$ 1.176,00, com possibilidade de parcelamento em até 12x de R$ 98,00, você ganha mais 3 meses de academia.',
+    );
+    assert.equal(
+      promoQuestions[1]?.answer[0],
+      'Não. A oferta de Black Friday é exclusiva para a contratação do plano anual Club+ Apollo.',
+    );
+  } else {
+    assert.equal(FAQ.length, 11);
+    assert.equal(promoQuestions.length, 0);
+  }
 });
 
-test('Planos tradicionais: observação de exclusão do Jiu-Jitsu e sem "todas as modalidades"', () => {
-  assert.equal(PLAN_EXCLUSION_NOTE, 'Todas as modalidades incluídas, exceto Jiu-Jitsu.');
+test('Black Friday: só o Club+ Apollo, sem mudar o preço original', () => {
+  assert.equal(BLACK_FRIDAY.planId, 'club-plus-apollo');
+  assert.equal(BLACK_FRIDAY.installment, '12x de R$ 98,00');
+  assert.equal(BLACK_FRIDAY.total, 'Ou R$ 1.176,00 no total.');
+  assert.equal(BLACK_FRIDAY.deadline, 'Oferta válida somente durante novembro de 2026.');
+  assert.equal(
+    new URL(buildWhatsAppLink(BLACK_FRIDAY.message)).searchParams.get('text'),
+    'Olá! Vi a oferta de Black Friday da Apollo Body & Health e tenho interesse no plano anual Club+ Apollo de R$ 1.176,00, com 3 meses extras. Gostaria de saber como aproveitar a promoção.',
+  );
+  assert.equal(new URL(buildWhatsAppLink(BLACK_FRIDAY.message)).pathname, '/5571999076612');
+  const club = PLANS.find((plan) => plan.id === BLACK_FRIDAY.planId);
+  assert.equal(club?.price, 'R$ 1.176,00');
+  assert.ok(club?.features.includes('Taxa de matrícula gratuita'));
+  assert.ok(club?.features.includes('4 avaliações físicas gratuitas'));
+  assert.ok(!club?.features.some((feature) => /black friday|3 meses/i.test(feature)));
+  assert.deepEqual(
+    PLANS.filter((plan) => plan.id === BLACK_FRIDAY.planId).map((plan) => plan.name),
+    ['Club+ Apollo'],
+  );
+});
+
+test('Planos tradicionais: observação de exclusão do Jiu-Jitsu e do Judô', () => {
+  assert.equal(
+    PLAN_EXCLUSION_NOTE,
+    'Todas as modalidades incluídas, exceto Jiu-Jitsu e Judô. Jiu-Jitsu e Judô possuem mensalidades independentes.',
+  );
   for (const p of PLANS) assert.ok(!p.features.some((f) => /todas as modalidades/i.test(f)));
 });
 
