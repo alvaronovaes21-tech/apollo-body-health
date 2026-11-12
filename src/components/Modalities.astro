@@ -16,6 +16,14 @@ const icons: Record<string, IconName> = {
   'jiu-jitsu-no-gi': 'belt',
   'jiu-kids': 'baby',
 };
+
+// Recorte 16:10 das fotos quadradas: mantém rostos e o ambiente, e tira a tarja inferior do Jiu-Kids.
+const photoPosition: Record<string, string> = {
+  musculacao: 'center 40%',
+  ritmos: 'center 40%',
+  'jiu-jitsu-adulto': 'center 28%',
+  'jiu-kids': 'center 22%',
+};
 ---
 
 <section class="section modalities" id={SECTIONS.modalidades} aria-labelledby="modalities-title">
@@ -40,6 +48,7 @@ const icons: Record<string, IconName> = {
                 placeholderLabel={`Foto de ${m.name}`}
                 sizes="(min-width: 1040px) 380px, (min-width: 640px) 46vw, 92vw"
                 widths={[480, 768, 1080]}
+                position={photoPosition[m.id] ?? 'center'}
               />
               <span class="mod__icon">
                 <Icon name={icons[m.id] ?? 'dumbbell'} size={22} />
@@ -104,7 +113,13 @@ const icons: Record<string, IconName> = {
   .mod__photo {
     position: relative;
     aspect-ratio: 16 / 10;
+    overflow: hidden;
     border-bottom: 1px solid var(--line);
+  }
+  /* A foto real fica presa ao quadro 16:10. Sem isso, a imagem quadrada aumenta o card. */
+  .mod__photo :global(.photo) {
+    position: absolute;
+    inset: 0;
   }
   .mod__icon {
     position: absolute;
