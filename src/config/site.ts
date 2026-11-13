@@ -70,9 +70,9 @@ export const SOCIAL = {
   cookiesUrl: clean(env.PUBLIC_COOKIES_URL) || '',
 } as const;
 
-/** MENSURAÇÃO — IDs vêm do .env. Vazio = integração desativada (a página funciona normalmente). */
+/** MENSURAÇÃO — o GTM da Apollo carrega por padrão. GA4/Ads diretos continuam só via .env. */
 export const ANALYTICS = {
-  gtmId: clean(env.PUBLIC_GTM_ID),
+  gtmId: clean(env.PUBLIC_GTM_ID) || 'GTM-TJ3XNGB4',
   ga4Id: clean(env.PUBLIC_GA4_ID),
   googleAdsId: clean(env.PUBLIC_GOOGLE_ADS_ID),
   /** Quando "true", o consentimento (Consent Mode v2) começa como "negado". */

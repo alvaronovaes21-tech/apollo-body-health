@@ -95,8 +95,8 @@ test('Localização e vídeo: link oficial; vídeo vazio por padrão', () => {
   assert.equal(YOUTUBE_VIDEO_ID, '');
 });
 
-test('Mensuração: sem IDs inventados', () => {
-  assert.equal(ANALYTICS.gtmId, '');
+test('Mensuração: GTM da Apollo; GA4 e Ads diretos sem ID', () => {
+  assert.equal(ANALYTICS.gtmId, 'GTM-TJ3XNGB4');
   assert.equal(ANALYTICS.ga4Id, '');
   assert.equal(ANALYTICS.googleAdsId, '');
 });
